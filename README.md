@@ -1,10 +1,10 @@
 # FitIQ
 
-**FitIQ** is a production-style machine learning ranking system for apparel products. Its goal is to help an e-commerce platform surface items that users are more likely to be satisfied with, particularly on **fit** and **overall product quality**, using noisy public signals such as review text, ratings, and product metadata.
+**FitIQ** is a machine learning ranking system for fashion e-commerce. It ranks apparel products by likely user satisfaction, with a focus on **fit** and **overall product quality**, using review text, ratings, and product metadata.
 
-Rather than treating raw star ratings as ground truth, FitIQ frames apparel satisfaction as a **ranking problem under weak supervision**. It combines product-level review evidence, fit-related signals, and metadata to rank items within comparable apparel groups such as **T-shirts, jackets, pants, dresses, and jewelry**.
+Fit is hard to infer from public marketplace data. Star ratings are noisy, review text is subjective, and products with strong headline ratings can still generate repeated sizing complaints. FitIQ handles this as a **within-category ranking problem** and builds product-level signals from weak public evidence.
 
-This project is designed to mirror the work of real algorithm and software teams building ranking systems: it emphasizes **clean data foundations, reproducibility, honest assumptions, offline evaluation, and modular engineering**.
+The project is scoped as a production-style ML pipeline: data ingestion, taxonomy construction, product-level feature generation, and offline ranking evaluation.
 
 ---
 
@@ -12,84 +12,82 @@ This project is designed to mirror the work of real algorithm and software teams
 
 Apparel reviews are noisy.
 
-A 5-star rating may reflect style, price, shipping, or expectations rather than actual fit. Review text can be contradictory, subjective, and biased by differences in body shape, sizing expectations, or intended style. A product with a high average rating may still be a poor recommendation if review evidence is sparse, inconsistent, or full of fit complaints.
+A 5-star rating may reflect style, price, shipping, or brand preference, with little connection to whether the item actually fits well. Review text has its own issues. It can be sparse, contradictory, and shaped by different sizing expectations.
 
-Naive ranking methods such as sorting by average rating often promote products that:
-- have high variance in user experience
-- have too little evidence
-- look good on the surface but fit poorly
-- mix together fundamentally different product types
+That makes naive ranking methods unreliable. Sorting by average rating often promotes products that:
+- have little evidence behind them
+- show inconsistent review patterns
+- contain recurring fit complaints
+- sit in the wrong comparison set
 
-FitIQ addresses this by ranking products **within relevant apparel subcategories** and explicitly modelling both **satisfaction** and **reliability of evidence**.
+FitIQ deals with this by:
+- ranking products **within comparable apparel groups**
+- extracting **fit-related and quality-related signals** at product level
+- accounting for **evidence strength**, not only average sentiment
 
 ---
 
-## Project Goal
+## Goal
 
 The goal of FitIQ is to build an end-to-end ranking pipeline that:
+- ingests and cleans large-scale review and metadata sources
+- derives product-level signals from weak labels
+- ranks products within relevant subcategories
+- supports offline evaluation with ranking metrics
+- is structured like a deployable ML system
 
-- ingests and cleans large-scale review and product metadata
-- derives product-level fit and quality signals from weak labels
-- ranks products within comparable subcategories
-- supports rigorous offline evaluation
-- is structured like a deployable production system
-
-The long-term product idea is simple:
-
-> Reduce the chance that a user’s first few viewed products lead to a poor fit experience.
+In practical terms, the system is intended to reduce the chance that a user’s first few viewed products lead to a poor fit experience.
 
 ---
 
 ## Current Scope
 
-FitIQ is currently focused on building the **data foundation correctly before modelling**.
+The current milestone is focused on the data and ranking foundation.
 
-### In scope now
-- Canonical review-level data pipeline
-- Product metadata integration
-- Apparel subcategory mapping
-- Product-level feature generation
-- Preparation for category-level ranking
+### In scope
+- canonical review-level data pipeline
+- product metadata integration
+- apparel subcategory mapping
+- product-level feature generation
+- preparation for category-level ranking
 
-### Explicitly out of scope for the current stage
-- Personalization
-- Online learning
+### Out of scope for now
+- personalization
+- online learning
 - A/B testing
-- Body measurement prediction
-- Computer vision features
-- Neural ranking models
+- body measurement prediction
+- computer vision features
+- neural ranking models
 - API and Docker deployment
 
-Those may be added later, but they are not part of the current milestone.
+These may come later, but they are outside the current build.
 
 ---
 
 ## Dataset
 
-FitIQ currently uses **Amazon Reviews 2023** as the primary dataset.
+FitIQ currently uses **Amazon Reviews 2023**.
 
 ### Why this dataset
 - large-scale and reproducible
-- contains review text, ratings, and product identifiers
-- includes metadata needed to derive product taxonomy
-- suitable for building a realistic ranking pipeline under weak supervision
+- includes review text, ratings, and product identifiers
+- includes metadata needed to derive product type
+- suitable for weakly supervised product ranking
 
 ### Key identifiers
-The dataset contains both:
+The dataset includes both:
 - `asin`
 - `parent_asin`
 
-For product-level aggregation and metadata joins, **`parent_asin` is the key product identifier**. This matters because multiple review-level variants can belong to the same parent product.
+For metadata joins and product-level aggregation, **`parent_asin` is the main product identifier**. Multiple review-level variants can map to the same parent product, so using `parent_asin` keeps the product view consistent.
 
 ---
 
 ## Core Data Model
 
-FitIQ separates the pipeline into two main tables.
+FitIQ is built around two main tables.
 
 ### 1. Canonical reviews table
-This is the first clean review-level artifact.
-
 **Row = one review**
 
 Typical columns:
@@ -103,13 +101,11 @@ Typical columns:
 - `title`
 
 Purpose:
-- preserve a clean and auditable review-level dataset
-- avoid repeatedly parsing raw source files
-- provide the foundation for feature engineering later
+- preserve a clean review-level dataset
+- avoid repeated parsing of raw source files
+- provide an auditable base for later feature engineering
 
 ### 2. Product features table
-This is the later model-ready table.
-
 **Row = one product**
 
 Typical columns:
@@ -121,15 +117,16 @@ Typical columns:
 - `log_review_count`
 - `fit_complaint_rate`
 
-Optional later columns:
+Possible later columns:
 - size descriptor aggregates
 - metadata-derived features
-- text embedding components
+- text embedding features
 - price and brand features
 
 Purpose:
-- provide a compact product-level feature table for ranking
-- support offline evaluation within query groups
+- provide a compact product-level table for ranking
+- support evaluation within query groups
+- keep feature generation separate from raw data handling
 
 ---
 
@@ -137,13 +134,14 @@ Purpose:
 
 FitIQ is a **within-category ranking system**.
 
-Products should only compete against other products of the same broad type. For example:
+Products compete only against items of the same broad type. For example:
 - T-shirts compete with T-shirts
 - jackets compete with jackets
 - pants compete with pants
+- dresses compete with dresses
 - jewelry competes with jewelry
 
-This is handled by constructing a **subcategory label** from metadata and using it as the **query group** for ranking.
+This is handled by deriving a controlled `subcategory` field from metadata and using it as the ranking query group.
 
 ### Example query groups
 - `t_shirt`
@@ -157,32 +155,32 @@ This is handled by constructing a **subcategory label** from metadata and using 
 - `accessories`
 - `unknown`
 
-This prevents nonsensical comparisons across very different product types.
+This keeps comparisons aligned with how users actually browse products.
 
 ---
 
 ## Subcategory Mapping
 
-The raw review data is not enough to determine whether a product is a T-shirt, jacket, or ring. To support within-category ranking, FitIQ joins review data with the product metadata and derives a controlled apparel taxonomy.
+The review dataset alone does not reliably tell us whether a product is a T-shirt, jacket, or ring. FitIQ solves this by joining reviews with product metadata and mapping each product into a controlled apparel taxonomy.
 
-### Subcategory derivation strategy
-1. Load metadata for the matching Amazon category split
-2. Use `parent_asin` to join metadata back to reviews
-3. Parse fields such as:
+### Strategy
+1. Load metadata for the relevant Amazon category split
+2. Join metadata back to reviews using `parent_asin`
+3. Parse useful fields such as:
    - `categories`
    - `title`
-   - other useful metadata
-4. Map products into a small controlled set of apparel subcategories
+   - other metadata fields where useful
+4. Map each product into a controlled set of apparel subcategories
 
-This gives FitIQ a stable `subcategory` field that later becomes the ranking query group.
+This produces a stable `subcategory` field for within-category ranking.
 
 ---
 
 ## Fit Signal and Weak Labels
 
-FitIQ treats fit satisfaction as a **latent variable** inferred from noisy public evidence.
+FitIQ treats fit satisfaction as a hidden variable inferred from noisy public evidence.
 
-Because the dataset does not contain true body measurements or return reasons, the system uses weak signals such as:
+The dataset does not contain body measurements, return reasons, or direct fit labels. The system uses weak signals such as:
 - star ratings
 - fit-related complaint phrases in review text
 - review consistency
@@ -198,7 +196,7 @@ Examples of fit-related phrases:
 - `didn't fit`
 - `not true to size`
 
-These signals are not perfect. That limitation is part of the design and is documented explicitly.
+These signals are imperfect. That limitation is part of the project and is handled explicitly in the pipeline design and evaluation.
 
 ---
 
@@ -218,7 +216,7 @@ These signals are not perfect. That limitation is part of the design and is docu
 
 ### Stage 3: Join taxonomy into reviews
 - merge subcategory labels into the canonical reviews table
-- ensure each review is linked to its product type
+- link each review to a product type
 
 ### Stage 4: Aggregate product-level features
 - group by `parent_asin`
@@ -227,28 +225,20 @@ These signals are not perfect. That limitation is part of the design and is docu
 
 ### Stage 5: Ranking model and evaluation
 - rank products within subcategory
-- evaluate using ranking metrics such as NDCG@K and Recall@K
+- evaluate with metrics such as NDCG@K and Recall@K
 - compare against simple baselines
 
 ---
 
-## Repository Structure
+## Engineering Principles
 
-```text
-FitIQ/
-├── data/
-│   ├── raw/
-│   ├── interim/
-│   └── processed/
-├── notebooks/
-├── src/
-│   ├── data/
-│   │   ├── build_reviews_table.py
-│   │   ├── build_product_taxonomy.py
-│   │   └── merge_reviews_taxonomy.py
-│   ├── features/
-│   │   └── build_product_features.py
-│   ├── modeling/
-│   └── evaluation/
-├── README.md
-└── requirements.txt
+FitIQ is being built around a few clear principles:
+- reproducible data artifacts
+- clear separation between raw data, features, and modeling
+- honest treatment of weak labels
+- modular scripts that can be extended later
+- evaluation against sensible baselines
+
+The goal is to build a ranking pipeline that is clean, defensible, and easy to extend.
+
+---
