@@ -17,9 +17,8 @@ SUPPORTED_SUFFIXES = (".jsonl", ".json", ".jsonl.gz", ".json.gz")
 UNKNOWN_SUBCATEGORY = "unknown"
 UNKNOWN_TITLE_SAMPLE_LIMIT = 10
 
-# Keep the taxonomy intentionally small and stable for the first milestone. We
-# want within-category ranking groups that are broad enough to have coverage,
-# without creating a noisy long tail of labels.
+# Keep the taxonomy broad and stable enough for within-category ranking, but
+# cover more of Amazon Fashion's long tail than title-only apparel buckets.
 SUBCATEGORY_RULES = (
     (
         "jewelry",
@@ -43,6 +42,16 @@ SUBCATEGORY_RULES = (
             "chokers",
             "cufflink",
             "cufflinks",
+            "ear cuff",
+            "ear cuffs",
+            "piercing",
+            "piercings",
+            "barbell",
+            "barbells",
+            "charm",
+            "charms",
+            "chain",
+            "chains",
         ),
     ),
     (
@@ -76,6 +85,55 @@ SUBCATEGORY_RULES = (
             "espadrilles",
             "wedge",
             "wedges",
+            "slide",
+            "slides",
+            "cleat",
+            "cleats",
+            "bootie",
+            "booties",
+        ),
+    ),
+    (
+        "eyewear",
+        (
+            "glasses",
+            "glass",
+            "eyeglasses",
+            "eyeglass",
+            "sunglasses",
+            "goggles",
+            "spectacle",
+            "spectacles",
+            "optical frame",
+            "optical frames",
+            "frame",
+            "frames",
+            "reader",
+            "readers",
+            "reading glasses",
+            "lens",
+            "lenses",
+            "rimless",
+            "horn rim",
+        ),
+    ),
+    (
+        "face_covering",
+        (
+            "face mask",
+            "face masks",
+            "mask",
+            "masks",
+            "mouth mask",
+            "mouth masks",
+            "balaclava",
+            "balaclavas",
+            "gaiter",
+            "gaiters",
+            "neck gaiter",
+            "neck gaiters",
+            "face covering",
+            "face coverings",
         ),
     ),
     (
@@ -132,6 +190,9 @@ SUBCATEGORY_RULES = (
             "bikinis",
             "one piece swimsuit",
             "tankini",
+            "lounger",
+            "loungers",
+            "loungewear",
         ),
     ),
     (
@@ -156,6 +217,50 @@ SUBCATEGORY_RULES = (
             "skirts",
             "skort",
             "skorts",
+        ),
+    ),
+    (
+        "uniform_costume",
+        (
+            "jersey",
+            "jerseys",
+            "leotard",
+            "leotards",
+            "unitard",
+            "unitards",
+            "tutu",
+            "tutus",
+            "ballet",
+            "gymnastics",
+            "gymnastic",
+            "dancewear",
+            "dance",
+            "costume",
+            "costumes",
+            "cosplay",
+            "uniform",
+            "uniforms",
+        ),
+    ),
+    (
+        "baby_kids",
+        (
+            "sleeper",
+            "sleepers",
+            "onesie",
+            "onesies",
+            "bodysuit",
+            "bodysuits",
+            "booties",
+            "bootie",
+            "bib",
+            "bibs",
+            "swaddle",
+            "swaddles",
+            "baby boy",
+            "baby girl",
+            "toddler",
+            "newborn",
         ),
     ),
     (
@@ -211,6 +316,9 @@ SUBCATEGORY_RULES = (
             "ponchos",
             "fleece jacket",
             "rain jacket",
+            "gilet",
+            "soft shell",
+            "outerwear",
         ),
     ),
     (
@@ -313,12 +421,46 @@ SUBCATEGORY_RULES = (
             "bow ties",
             "bowtie",
             "bowties",
+            "keychain",
+            "keychains",
+            "key ring",
+            "key rings",
+            "keyring",
+            "keyrings",
+            "lanyard",
+            "lanyards",
+            "wristband",
+            "wristbands",
+            "strap",
+            "straps",
+            "hair wrap",
+            "hair wraps",
+            "turban",
+            "turbans",
+            "pouch",
+            "pouches",
+            "umbrella",
+            "umbrellas",
+            "apron",
+            "aprons",
+            "bandana",
+            "bandanas",
+            "banner",
+            "flags",
         ),
     ),
 )
 
 NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 WHITESPACE_RE = re.compile(r"\s+")
+FIELD_CANDIDATES = {
+    "parent_asin": ("parent_asin", "parentAsin"),
+    "title": ("title",),
+    "categories": ("categories",),
+    "main_category": ("main_category", "mainCategory"),
+    "features": ("features",),
+    "description": ("description",),
+}
 
 
 def parse_args() -> argparse.Namespace:
@@ -490,41 +632,70 @@ def serialize_categories(categories: list[str]) -> str:
     return json.dumps(categories, ensure_ascii=True)
 
 
-def contains_any_keyword(text: str, keywords: Iterable[str]) -> bool:
-    if not text:
-        return False
-    padded_text = f" {text} "
-    for keyword in keywords:
-        normalized_keyword = normalize_match_text(keyword)
-        if normalized_keyword and f" {normalized_keyword} " in padded_text:
-            return True
-    return False
+def parse_text_list(value: object) -> list[str]:
+    texts: list[str] = []
+
+    def walk(item: object) -> None:
+        if item is None:
+            return
+        if isinstance(item, list):
+            for child in item:
+                walk(child)
+            return
+        text = clean_text(item)
+        if text is not None:
+            texts.append(text)
+
+    walk(value)
+    return texts
 
 
-def derive_subcategory(categories: list[str], title: str | None) -> tuple[str, str]:
+def build_keyword_patterns() -> list[tuple[str, re.Pattern[str]]]:
+    patterns: list[tuple[str, re.Pattern[str]]] = []
+    for label, keywords in SUBCATEGORY_RULES:
+        normalized_keywords: list[str] = []
+        for keyword in keywords:
+            normalized_keyword = normalize_match_text(keyword)
+            if normalized_keyword:
+                escaped = re.escape(normalized_keyword).replace(r"\ ", r"\s+")
+                normalized_keywords.append(escaped)
+        normalized_keywords = sorted(set(normalized_keywords), key=len, reverse=True)
+        joined = "|".join(normalized_keywords)
+        patterns.append((label, re.compile(rf"(?<![a-z0-9])(?:{joined})(?![a-z0-9])")))
+    return patterns
+
+
+SUBCATEGORY_PATTERNS = build_keyword_patterns()
+
+
+def derive_subcategory(
+    categories: list[str],
+    title: str | None,
+    features: list[str],
+    description: list[str],
+) -> tuple[str, str]:
     category_text = normalize_match_text(" ".join(categories))
     title_text = normalize_match_text(title)
+    metadata_text = normalize_match_text(" ".join([title or "", *features, *description]))
 
-    for label, keywords in SUBCATEGORY_RULES:
-        if contains_any_keyword(category_text, keywords):
+    for label, pattern in SUBCATEGORY_PATTERNS:
+        if category_text and pattern.search(category_text):
             return label, "categories"
 
-    for label, keywords in SUBCATEGORY_RULES:
-        if contains_any_keyword(title_text, keywords):
+    for label, pattern in SUBCATEGORY_PATTERNS:
+        if title_text and pattern.search(title_text):
             return label, "title"
+
+    for label, pattern in SUBCATEGORY_PATTERNS:
+        if metadata_text and pattern.search(metadata_text):
+            return label, "metadata_text"
 
     return UNKNOWN_SUBCATEGORY, "unknown"
 
 
 def resolve_field_map(record: dict[str, object], path: Path) -> dict[str, str | None]:
-    field_candidates = {
-        "parent_asin": ("parent_asin", "parentAsin"),
-        "title": ("title",),
-        "categories": ("categories",),
-        "main_category": ("main_category", "mainCategory"),
-    }
     field_map: dict[str, str | None] = {}
-    for target_column, candidates in field_candidates.items():
+    for target_column, candidates in FIELD_CANDIDATES.items():
         field_map[target_column] = next((name for name in candidates if name in record), None)
 
     if field_map["parent_asin"] is None:
@@ -725,6 +896,16 @@ def main() -> int:
                     if field_map["categories"] is not None
                     else []
                 )
+                features = (
+                    parse_text_list(record.get(field_map["features"]))
+                    if field_map["features"] is not None
+                    else []
+                )
+                description = (
+                    parse_text_list(record.get(field_map["description"]))
+                    if field_map["description"] is not None
+                    else []
+                )
                 raw_categories = serialize_categories(categories)
                 main_category = (
                     clean_text(record.get(field_map["main_category"]))
@@ -734,7 +915,12 @@ def main() -> int:
                 if main_category is None:
                     main_category = inferred_category
 
-                subcategory, subcategory_source = derive_subcategory(categories, title)
+                subcategory, subcategory_source = derive_subcategory(
+                    categories=categories,
+                    title=title,
+                    features=features,
+                    description=description,
+                )
 
                 batch["parent_asin"].append(parent_asin)
                 batch["main_category"].append(main_category)
