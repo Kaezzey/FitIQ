@@ -1,6 +1,6 @@
 # FitIQ
 
-**FitIQ** is a machine learning ranking system for fashion e-commerce. It ranks apparel products by likely user satisfaction, with a focus on **fit** and **overall product quality**, using review text, ratings, and product metadata.
+**FitIQ** is a machine learning ranking system for fashion e-commerce. It ranks apparel products by likely user satisfaction, with a focus on **fit** and **overall product quality**, using review text, ratings, and product metadata. A great fashion product looks great but also has to **fit well** on your customers, and therefore should be promoted more on the store page.
 
 Fit is hard to infer from public marketplace data. Star ratings are noisy, review text is subjective, and products with strong headline ratings can still generate repeated sizing complaints. FitIQ handles this as a **within-category ranking problem** and builds product-level signals from weak public evidence.
 
