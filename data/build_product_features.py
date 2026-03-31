@@ -12,6 +12,7 @@ DEFAULT_REVIEWS_PATH = Path("data/processed/reviews_canonical.parquet")
 DEFAULT_TAXONOMY_PATH = Path("data/processed/product_taxonomy.parquet")
 DEFAULT_OUTPUT_PATH = Path("data/processed/product_features.parquet")
 UNKNOWN_SUBCATEGORY = "unknown"
+UNKNOWN_RANKING_GROUP = "unknown"
 NEGATIVE_FIT_KEYWORDS = (
     "too small",
     "too big",
@@ -145,6 +146,8 @@ def print_audit_summary(
     review_counts = sorted(features["review_count"].astype(float).tolist())
     fit_rates = sorted(features["fit_complaint_rate"].astype(float).tolist())
     subcategory_counts = Counter(features["subcategory"].tolist())
+    ranking_group_counts = Counter(features["ranking_group"].tolist())
+    apparel_count = int(features["is_apparel"].sum())
 
     print()
     print("Product features build complete")
@@ -163,6 +166,16 @@ def print_audit_summary(
     print("Subcategory distribution")
     for subcategory, count in subcategory_counts.most_common():
         print(f"  {subcategory}: {count}")
+
+    print()
+    print("Ranking group distribution")
+    for ranking_group, count in ranking_group_counts.most_common():
+        print(f"  {ranking_group}: {count}")
+
+    print()
+    print("Apparel coverage")
+    print(f"  apparel_products: {apparel_count}")
+    print(f"  apparel_product_pct: {(apparel_count / total_products * 100.0) if total_products else 0.0:.2f}%")
 
     print()
     print("Reviews per product summary")
@@ -216,7 +229,7 @@ def main() -> int:
         )
         taxonomy = pd.read_parquet(
             taxonomy_path,
-            columns=["parent_asin", "subcategory"],
+            columns=["parent_asin", "subcategory", "ranking_group", "is_apparel"],
         )
         print(
             f"Loaded {len(reviews):,} review rows and {len(taxonomy):,} taxonomy rows."
@@ -232,7 +245,7 @@ def main() -> int:
     )
     validate_required_columns(
         taxonomy,
-        {"parent_asin", "subcategory"},
+        {"parent_asin", "subcategory", "ranking_group", "is_apparel"},
         str(taxonomy_path),
     )
 
@@ -297,12 +310,16 @@ def main() -> int:
     unmatched_taxonomy_count = int(unmatched_taxonomy_mask.sum())
     missing_parent_count = int(features["parent_asin"].isna().sum())
     features["subcategory"] = features["subcategory"].fillna(UNKNOWN_SUBCATEGORY)
+    features["ranking_group"] = features["ranking_group"].fillna(UNKNOWN_RANKING_GROUP)
+    features["is_apparel"] = features["is_apparel"].fillna(False).astype(bool)
 
     output_columns = [
         "asin",
         "parent_asin",
         "category",
         "subcategory",
+        "ranking_group",
+        "is_apparel",
         "mean_rating",
         "rating_variance",
         "review_count",

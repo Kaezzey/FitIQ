@@ -15,7 +15,14 @@ DEFAULT_OUTPUT_PATH = Path("data/processed/product_taxonomy.parquet")
 DEFAULT_CATEGORY_STEMS = ("Amazon_Fashion",)
 SUPPORTED_SUFFIXES = (".jsonl", ".json", ".jsonl.gz", ".json.gz")
 UNKNOWN_SUBCATEGORY = "unknown"
+UNKNOWN_RANKING_GROUP = "unknown"
 UNKNOWN_TITLE_SAMPLE_LIMIT = 10
+FIELD_WEIGHTS = {
+    "categories": 5.0,
+    "title": 4.0,
+    "features": 2.5,
+    "description": 1.5,
+}
 
 # Keep the taxonomy broad and stable enough for within-category ranking, but
 # cover more of Amazon Fashion's long tail than title-only apparel buckets.
@@ -451,6 +458,337 @@ SUBCATEGORY_RULES = (
     ),
 )
 
+RANKING_GROUP_BY_SUBCATEGORY = {
+    "t_shirt": "tops",
+    "shirt_top": "tops",
+    "sweater": "tops",
+    "pants": "bottoms",
+    "skirt": "bottoms",
+    "jacket": "outerwear",
+    "dress": "dress",
+    "underwear_sleepwear": "intimates_sleep",
+    "shoes": "footwear",
+}
+
+TOP_FINE_LABEL_ORDER = ("t_shirt", "shirt_top", "sweater")
+SHIRT_TOP_GENERIC_KEYWORDS = ("shirt", "shirts", "top", "tops")
+SHIRT_TOP_SPECIFIC_KEYWORDS = (
+    "blouse",
+    "blouses",
+    "tunic",
+    "tunics",
+    "tank top",
+    "tank tops",
+    "tank",
+    "tanks",
+    "polo",
+    "polos",
+    "henley",
+    "henleys",
+    "crop top",
+    "crop tops",
+    "button down",
+    "button down shirt",
+    "button up",
+    "button up shirt",
+    "button front",
+)
+TOP_FINE_RULES = {
+    "t_shirt": {
+        "positive": (
+            "t shirt",
+            "t shirts",
+            "tshirt",
+            "tshirts",
+            "tee",
+            "tees",
+            "graphic tee",
+            "graphic tees",
+            "crew tee",
+            "crew tees",
+            "crew neck tee",
+            "crew neck tees",
+            "pocket tee",
+            "pocket tees",
+            "short sleeve tee",
+            "short sleeve tees",
+            "v neck tee",
+            "v neck tees",
+        ),
+        "exclude": (
+            "polo",
+            "polos",
+            "blouse",
+            "blouses",
+            "tunic",
+            "tunics",
+            "cardigan",
+            "cardigans",
+            "hoodie",
+            "hoodies",
+            "sweater",
+            "sweaters",
+            "sweatshirt",
+            "sweatshirts",
+            "pullover",
+            "pullovers",
+        ),
+    },
+    "shirt_top": {
+        "positive": (
+            "shirt",
+            "shirts",
+            "top",
+            "tops",
+            "blouse",
+            "blouses",
+            "tunic",
+            "tunics",
+            "tank top",
+            "tank tops",
+            "tank",
+            "tanks",
+            "polo",
+            "polos",
+            "henley",
+            "henleys",
+            "crop top",
+            "crop tops",
+            "button down",
+            "button down shirt",
+            "button up",
+            "button up shirt",
+            "button front",
+        ),
+        "exclude": (
+            "tee",
+            "tees",
+            "t shirt",
+            "t shirts",
+            "tshirt",
+            "tshirts",
+            "graphic tee",
+            "graphic tees",
+            "hoodie",
+            "hoodies",
+            "cardigan",
+            "cardigans",
+            "sweater",
+            "sweaters",
+            "sweatshirt",
+            "sweatshirts",
+        ),
+    },
+    "sweater": {
+        "positive": (
+            "sweater",
+            "sweaters",
+            "sweatshirt",
+            "sweatshirts",
+            "hoodie",
+            "hoodies",
+            "pullover",
+            "pullovers",
+            "cardigan",
+            "cardigans",
+            "jumper",
+            "jumpers",
+            "knit",
+            "knits",
+            "knitted",
+            "fleece",
+            "thermal knit",
+            "chunky knit",
+        ),
+        "exclude": (
+            "tee",
+            "tees",
+            "t shirt",
+            "t shirts",
+            "tshirt",
+            "tshirts",
+            "graphic tee",
+            "graphic tees",
+            "polo",
+            "polos",
+            "blouse",
+            "blouses",
+            "tank top",
+            "tank tops",
+        ),
+    },
+}
+
+BROAD_RANKING_GROUP_RULES = (
+    (
+        "tops",
+        (
+            "top",
+            "tops",
+            "shirt",
+            "shirts",
+            "tee",
+            "tees",
+            "t shirt",
+            "t shirts",
+            "tshirt",
+            "tshirts",
+            "blouse",
+            "blouses",
+            "tank",
+            "tanks",
+            "tank top",
+            "tank tops",
+            "tunic",
+            "tunics",
+            "polo",
+            "polos",
+            "henley",
+            "henleys",
+            "crew neck",
+            "crewneck",
+            "v neck",
+            "vneck",
+            "mock neck",
+            "long sleeve",
+            "short sleeve",
+            "sleeveless",
+            "sweater",
+            "sweaters",
+            "hoodie",
+            "hoodies",
+            "sweatshirt",
+            "sweatshirts",
+            "cardigan",
+            "cardigans",
+            "pullover",
+            "pullovers",
+            "jumper",
+            "jumpers",
+            "knit",
+            "knitted",
+            "fleece",
+        ),
+    ),
+    (
+        "bottoms",
+        (
+            "pant",
+            "pants",
+            "trouser",
+            "trousers",
+            "jean",
+            "jeans",
+            "legging",
+            "leggings",
+            "jogger",
+            "joggers",
+            "short",
+            "shorts",
+            "skirt",
+            "skirts",
+            "skort",
+            "skorts",
+            "waistband",
+            "drawstring",
+            "inseam",
+        ),
+    ),
+    (
+        "outerwear",
+        (
+            "jacket",
+            "jackets",
+            "coat",
+            "coats",
+            "blazer",
+            "blazers",
+            "parka",
+            "parkas",
+            "windbreaker",
+            "windbreakers",
+            "outerwear",
+            "full zip",
+            "zip front",
+            "zip up",
+            "shell",
+            "puffer",
+        ),
+    ),
+    (
+        "dress",
+        (
+            "dress",
+            "dresses",
+            "gown",
+            "gowns",
+            "sundress",
+            "sundresses",
+            "maxi dress",
+            "midi dress",
+            "mini dress",
+        ),
+    ),
+    (
+        "intimates_sleep",
+        (
+            "bra",
+            "bras",
+            "brief",
+            "briefs",
+            "panty",
+            "panties",
+            "underwear",
+            "lingerie",
+            "sleepwear",
+            "nightwear",
+            "nightgown",
+            "nightshirt",
+            "robe",
+            "robes",
+            "pajama",
+            "pajamas",
+            "pyjama",
+            "pyjamas",
+            "swimwear",
+            "swimsuit",
+            "bikini",
+            "bikinis",
+            "loungewear",
+        ),
+    ),
+    (
+        "footwear",
+        (
+            "shoe",
+            "shoes",
+            "sneaker",
+            "sneakers",
+            "boot",
+            "boots",
+            "sandal",
+            "sandals",
+            "heel",
+            "heels",
+            "loafer",
+            "loafers",
+            "flat",
+            "flats",
+            "slipper",
+            "slippers",
+            "clog",
+            "clogs",
+            "mule",
+            "mules",
+            "wedge",
+            "wedges",
+            "slide",
+            "slides",
+            "footwear",
+        ),
+    ),
+)
+
 NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 WHITESPACE_RE = re.compile(r"\s+")
 FIELD_CANDIDATES = {
@@ -650,9 +988,11 @@ def parse_text_list(value: object) -> list[str]:
     return texts
 
 
-def build_keyword_patterns() -> list[tuple[str, re.Pattern[str]]]:
+def build_keyword_patterns(
+    rules: tuple[tuple[str, tuple[str, ...]], ...]
+) -> list[tuple[str, re.Pattern[str]]]:
     patterns: list[tuple[str, re.Pattern[str]]] = []
-    for label, keywords in SUBCATEGORY_RULES:
+    for label, keywords in rules:
         normalized_keywords: list[str] = []
         for keyword in keywords:
             normalized_keyword = normalize_match_text(keyword)
@@ -665,7 +1005,166 @@ def build_keyword_patterns() -> list[tuple[str, re.Pattern[str]]]:
     return patterns
 
 
-SUBCATEGORY_PATTERNS = build_keyword_patterns()
+def build_keyword_pattern(keywords: tuple[str, ...]) -> re.Pattern[str]:
+    normalized_keywords: list[str] = []
+    for keyword in keywords:
+        normalized_keyword = normalize_match_text(keyword)
+        if normalized_keyword:
+            escaped = re.escape(normalized_keyword).replace(r"\ ", r"\s+")
+            normalized_keywords.append(escaped)
+
+    normalized_keywords = sorted(set(normalized_keywords), key=len, reverse=True)
+    joined = "|".join(normalized_keywords)
+    return re.compile(rf"(?<![a-z0-9])(?:{joined})(?![a-z0-9])")
+
+
+SUBCATEGORY_PATTERNS = build_keyword_patterns(SUBCATEGORY_RULES)
+BROAD_RANKING_GROUP_PATTERNS = build_keyword_patterns(BROAD_RANKING_GROUP_RULES)
+TOP_FINE_PATTERNS = {
+    label: {
+        "positive": build_keyword_pattern(rule["positive"]),
+        "exclude": build_keyword_pattern(rule["exclude"]),
+    }
+    for label, rule in TOP_FINE_RULES.items()
+}
+SHIRT_TOP_GENERIC_PATTERN = build_keyword_pattern(SHIRT_TOP_GENERIC_KEYWORDS)
+SHIRT_TOP_SPECIFIC_PATTERN = build_keyword_pattern(SHIRT_TOP_SPECIFIC_KEYWORDS)
+
+
+def count_pattern_matches(text: str, pattern: re.Pattern[str]) -> int:
+    return sum(1 for _ in pattern.finditer(text))
+
+
+def score_patterns(
+    field_texts: dict[str, str],
+    patterns: list[tuple[str, re.Pattern[str]]],
+) -> tuple[str | None, str | None, dict[str, float]]:
+    scores = {label: 0.0 for label, _ in patterns}
+    best_field_for_label: dict[str, tuple[float, str]] = {}
+    label_order = {label: index for index, (label, _) in enumerate(patterns)}
+
+    for label_index, (label, pattern) in enumerate(patterns):
+        best_field_weight = 0.0
+        best_field_name: str | None = None
+        for field_name, field_text in field_texts.items():
+            if not field_text:
+                continue
+            if pattern.search(field_text):
+                field_weight = FIELD_WEIGHTS[field_name]
+                scores[label] += field_weight
+                if field_weight > best_field_weight:
+                    best_field_weight = field_weight
+                    best_field_name = field_name
+        if best_field_name is not None:
+            best_field_for_label[label] = (best_field_weight, best_field_name)
+
+    ranked_labels = [
+        label for label, score in scores.items() if score > 0.0
+    ]
+    if not ranked_labels:
+        return None, None, scores
+
+    ranked_labels.sort(
+        key=lambda label: (
+            -scores[label],
+            -best_field_for_label.get(label, (0.0, ""))[0],
+            label_order[label],
+        )
+    )
+    best_label = ranked_labels[0]
+    best_field_name = best_field_for_label[best_label][1]
+    return best_label, best_field_name, scores
+
+
+def classify_top_fine_subcategory(
+    field_texts: dict[str, str],
+) -> tuple[str, str]:
+    scores = {label: 0.0 for label in TOP_FINE_LABEL_ORDER}
+    strong_field_hits = {label: 0 for label in TOP_FINE_LABEL_ORDER}
+    weak_field_hits = {label: 0 for label in TOP_FINE_LABEL_ORDER}
+    best_positive_field: dict[str, tuple[float, str]] = {}
+
+    for label in TOP_FINE_LABEL_ORDER:
+        positive_pattern = TOP_FINE_PATTERNS[label]["positive"]
+        exclude_pattern = TOP_FINE_PATTERNS[label]["exclude"]
+        strongest_positive_weight = 0.0
+        strongest_positive_field: str | None = None
+        strong_exclusion_without_strong_positive = False
+
+        for field_name, field_text in field_texts.items():
+            if not field_text:
+                continue
+
+            positive_count = count_pattern_matches(field_text, positive_pattern)
+            exclude_count = count_pattern_matches(field_text, exclude_pattern)
+
+            if positive_count:
+                weighted_positive = FIELD_WEIGHTS[field_name] * min(2, positive_count)
+                scores[label] += weighted_positive
+                if FIELD_WEIGHTS[field_name] > strongest_positive_weight:
+                    strongest_positive_weight = FIELD_WEIGHTS[field_name]
+                    strongest_positive_field = field_name
+                if field_name in {"categories", "title"}:
+                    strong_field_hits[label] += 1
+                else:
+                    weak_field_hits[label] += 1
+
+            if exclude_count:
+                weighted_exclusion = FIELD_WEIGHTS[field_name] * min(2, exclude_count)
+                if field_name in {"categories", "title"} and strong_field_hits[label] == 0:
+                    strong_exclusion_without_strong_positive = True
+                scores[label] -= weighted_exclusion
+
+        if strong_exclusion_without_strong_positive:
+            scores[label] = 0.0
+        if scores[label] < 0.0:
+            scores[label] = 0.0
+        if strongest_positive_field is not None:
+            best_positive_field[label] = (
+                strongest_positive_weight,
+                strongest_positive_field,
+            )
+
+    ranked_labels = sorted(
+        TOP_FINE_LABEL_ORDER,
+        key=lambda label: (-scores[label], TOP_FINE_LABEL_ORDER.index(label)),
+    )
+    best_label = ranked_labels[0]
+    second_label = ranked_labels[1]
+    best_score = scores[best_label]
+    second_score = scores[second_label]
+
+    if best_score <= 0.0:
+        return UNKNOWN_SUBCATEGORY, "tops_weak_signal"
+
+    has_strong_evidence = strong_field_hits[best_label] > 0
+    has_multiple_weak_hits = weak_field_hits[best_label] >= 2
+    if not has_strong_evidence and not has_multiple_weak_hits:
+        return UNKNOWN_SUBCATEGORY, "tops_weak_signal"
+
+    if best_label == "shirt_top":
+        generic_hits = 0
+        specific_hits = 0
+        for field_text in field_texts.values():
+            if not field_text:
+                continue
+            generic_hits += count_pattern_matches(field_text, SHIRT_TOP_GENERIC_PATTERN)
+            specific_hits += count_pattern_matches(field_text, SHIRT_TOP_SPECIFIC_PATTERN)
+        if specific_hits == 0 and generic_hits > 0:
+            return UNKNOWN_SUBCATEGORY, "tops_generic_only"
+
+    if second_score > 0.0 and (best_score - second_score) < 2.0:
+        return UNKNOWN_SUBCATEGORY, "tops_ambiguous"
+
+    if (
+        not has_strong_evidence
+        and second_score > 0.0
+        and (best_score - second_score) < 3.0
+    ):
+        return UNKNOWN_SUBCATEGORY, "tops_ambiguous"
+
+    source_field = best_positive_field.get(best_label, (0.0, "unknown"))[1]
+    return best_label, f"tops_scored_{source_field}"
 
 
 def derive_subcategory(
@@ -673,24 +1172,55 @@ def derive_subcategory(
     title: str | None,
     features: list[str],
     description: list[str],
-) -> tuple[str, str]:
-    category_text = normalize_match_text(" ".join(categories))
-    title_text = normalize_match_text(title)
-    metadata_text = normalize_match_text(" ".join([title or "", *features, *description]))
+) -> tuple[str, str, str, bool]:
+    field_texts = {
+        "categories": normalize_match_text(" ".join(categories)),
+        "title": normalize_match_text(title),
+        "features": normalize_match_text(" ".join(features)),
+        "description": normalize_match_text(" ".join(description)),
+    }
 
-    for label, pattern in SUBCATEGORY_PATTERNS:
-        if category_text and pattern.search(category_text):
-            return label, "categories"
+    best_ranking_group, broad_field_name, _ = score_patterns(
+        field_texts, BROAD_RANKING_GROUP_PATTERNS
+    )
+    if best_ranking_group is not None:
+        if best_ranking_group == "tops":
+            top_subcategory, top_source = classify_top_fine_subcategory(field_texts)
+            return top_subcategory, top_source, "tops", True
 
-    for label, pattern in SUBCATEGORY_PATTERNS:
-        if title_text and pattern.search(title_text):
-            return label, "title"
+        best_subcategory, best_field_name, _ = score_patterns(
+            field_texts, SUBCATEGORY_PATTERNS
+        )
+        if best_subcategory is not None:
+            mapped_group = RANKING_GROUP_BY_SUBCATEGORY.get(
+                best_subcategory, UNKNOWN_RANKING_GROUP
+            )
+            if mapped_group == best_ranking_group:
+                return (
+                    best_subcategory,
+                    f"scored_{best_field_name}",
+                    best_ranking_group,
+                    True,
+                )
+        return (
+            UNKNOWN_SUBCATEGORY,
+            f"fallback_{broad_field_name}",
+            best_ranking_group,
+            True,
+        )
 
-    for label, pattern in SUBCATEGORY_PATTERNS:
-        if metadata_text and pattern.search(metadata_text):
-            return label, "metadata_text"
+    best_subcategory, best_field_name, _ = score_patterns(field_texts, SUBCATEGORY_PATTERNS)
+    if best_subcategory is not None:
+        ranking_group = RANKING_GROUP_BY_SUBCATEGORY.get(
+            best_subcategory, UNKNOWN_RANKING_GROUP
+        )
+        if ranking_group == "tops":
+            top_subcategory, top_source = classify_top_fine_subcategory(field_texts)
+            return top_subcategory, top_source, "tops", True
+        is_apparel = ranking_group != UNKNOWN_RANKING_GROUP
+        return best_subcategory, f"scored_{best_field_name}", ranking_group, is_apparel
 
-    return UNKNOWN_SUBCATEGORY, "unknown"
+    return UNKNOWN_SUBCATEGORY, "unknown", UNKNOWN_RANKING_GROUP, False
 
 
 def resolve_field_map(record: dict[str, object], path: Path) -> dict[str, str | None]:
@@ -734,6 +1264,8 @@ def build_schema(pyarrow_module) -> object:
             pa.field("title", pa.string()),
             pa.field("subcategory", pa.string()),
             pa.field("subcategory_source", pa.string()),
+            pa.field("ranking_group", pa.string()),
+            pa.field("is_apparel", pa.bool_()),
         ]
     )
 
@@ -746,6 +1278,8 @@ def empty_batch() -> dict[str, list[object]]:
         "title": [],
         "subcategory": [],
         "subcategory_source": [],
+        "ranking_group": [],
+        "is_apparel": [],
     }
 
 
@@ -762,14 +1296,21 @@ def print_audit_summary(
     total_products: int,
     missing_counts: Counter[str],
     subcategory_counts: Counter[str],
+    ranking_group_counts: Counter[str],
+    tops_subcategory_counts: Counter[str],
+    apparel_counts: Counter[bool],
     source_counts: Counter[str],
     dropped_rows: Counter[str],
     input_files: list[Path],
     output_path: Path,
     unknown_title_samples: list[str],
+    tops_unknown_title_samples: list[str],
 ) -> None:
     unknown_count = subcategory_counts[UNKNOWN_SUBCATEGORY]
     unknown_pct = (unknown_count / total_products * 100.0) if total_products else 0.0
+    apparel_count = apparel_counts[True]
+    apparel_pct = (apparel_count / total_products * 100.0) if total_products else 0.0
+    tops_unknown_count = tops_subcategory_counts[UNKNOWN_SUBCATEGORY]
 
     print()
     print("Product taxonomy build complete")
@@ -785,7 +1326,7 @@ def print_audit_summary(
 
     print()
     print("Missing counts for key columns")
-    for column in ("parent_asin", "title", "raw_categories", "subcategory"):
+    for column in ("parent_asin", "title", "raw_categories", "subcategory", "ranking_group"):
         print(f"  {column}: {missing_counts[column]}")
 
     print()
@@ -794,14 +1335,33 @@ def print_audit_summary(
         print(f"  {subcategory}: {count}")
 
     print()
+    print("Ranking group distribution")
+    for ranking_group, count in ranking_group_counts.most_common():
+        print(f"  {ranking_group}: {count}")
+
+    print()
     print("Subcategory source distribution")
     for source, count in source_counts.most_common():
         print(f"  {source}: {count}")
 
     print()
+    print("Apparel coverage")
+    print(f"  apparel_products: {apparel_count}")
+    print(f"  apparel_product_pct: {apparel_pct:.2f}%")
+    print(f"  non_apparel_products: {apparel_counts[False]}")
+
+    print()
     print("Unknown subcategory coverage")
     print(f"  unknown_products: {unknown_count}")
     print(f"  unknown_product_pct: {unknown_pct:.2f}%")
+
+    print()
+    print("Tops fine-label diagnostics")
+    for subcategory, count in tops_subcategory_counts.most_common():
+        print(f"  {subcategory}: {count}")
+    if not tops_subcategory_counts:
+        print("  (none)")
+    print(f"  tops_unknown_products: {tops_unknown_count}")
 
     print()
     print("Dropped rows by reason")
@@ -815,6 +1375,14 @@ def print_audit_summary(
     print("Sample unknown titles")
     if unknown_title_samples:
         for title in unknown_title_samples:
+            print(f"  - {title}")
+    else:
+        print("  (none)")
+
+    print()
+    print("Sample tops unknown titles")
+    if tops_unknown_title_samples:
+        for title in tops_unknown_title_samples:
             print(f"  - {title}")
     else:
         print("  (none)")
@@ -858,13 +1426,18 @@ def main() -> int:
             "title": 0,
             "raw_categories": 0,
             "subcategory": 0,
+            "ranking_group": 0,
         }
     )
     subcategory_counts: Counter[str] = Counter()
+    ranking_group_counts: Counter[str] = Counter()
+    tops_subcategory_counts: Counter[str] = Counter()
+    apparel_counts: Counter[bool] = Counter()
     source_counts: Counter[str] = Counter()
     dropped_rows: Counter[str] = Counter()
     seen_parent_asins: set[str] = set()
     unknown_title_samples: list[str] = []
+    tops_unknown_title_samples: list[str] = []
 
     writer = None
     try:
@@ -915,7 +1488,7 @@ def main() -> int:
                 if main_category is None:
                     main_category = inferred_category
 
-                subcategory, subcategory_source = derive_subcategory(
+                subcategory, subcategory_source, ranking_group, is_apparel = derive_subcategory(
                     categories=categories,
                     title=title,
                     features=features,
@@ -928,19 +1501,30 @@ def main() -> int:
                 batch["title"].append(title)
                 batch["subcategory"].append(subcategory)
                 batch["subcategory_source"].append(subcategory_source)
+                batch["ranking_group"].append(ranking_group)
+                batch["is_apparel"].append(is_apparel)
 
                 seen_parent_asins.add(parent_asin)
                 total_products += 1
                 subcategory_counts[subcategory] += 1
+                ranking_group_counts[ranking_group] += 1
+                if ranking_group == "tops":
+                    tops_subcategory_counts[subcategory] += 1
+                apparel_counts[is_apparel] += 1
                 source_counts[subcategory_source] += 1
 
                 if title is None:
                     missing_counts["title"] += 1
                 if not categories:
                     missing_counts["raw_categories"] += 1
-                if subcategory == UNKNOWN_SUBCATEGORY and title is not None:
+                if ranking_group == UNKNOWN_RANKING_GROUP:
+                    missing_counts["ranking_group"] += 1
+                if subcategory == UNKNOWN_SUBCATEGORY and ranking_group == UNKNOWN_RANKING_GROUP and title is not None:
                     if len(unknown_title_samples) < UNKNOWN_TITLE_SAMPLE_LIMIT:
                         unknown_title_samples.append(title)
+                if ranking_group == "tops" and subcategory == UNKNOWN_SUBCATEGORY and title is not None:
+                    if len(tops_unknown_title_samples) < UNKNOWN_TITLE_SAMPLE_LIMIT:
+                        tops_unknown_title_samples.append(title)
 
                 if len(batch["parent_asin"]) >= args.batch_size:
                     write_batch(writer, pa, schema, batch)
@@ -973,11 +1557,15 @@ def main() -> int:
         total_products=total_products,
         missing_counts=missing_counts,
         subcategory_counts=subcategory_counts,
+        ranking_group_counts=ranking_group_counts,
+        tops_subcategory_counts=tops_subcategory_counts,
+        apparel_counts=apparel_counts,
         source_counts=source_counts,
         dropped_rows=dropped_rows,
         input_files=input_files,
         output_path=output_path,
         unknown_title_samples=unknown_title_samples,
+        tops_unknown_title_samples=tops_unknown_title_samples,
     )
     return 0
 
