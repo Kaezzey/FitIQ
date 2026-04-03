@@ -14,10 +14,16 @@ from pathlib import Path
 DEFAULT_REVIEWS_PATH = Path("data/processed/reviews_canonical.parquet")
 DEFAULT_TAXONOMY_PATH = Path("data/processed/product_taxonomy.parquet")
 DEFAULT_OUTPUT_PATH = Path("data/processed/ranking_eval_dataset.parquet")
+LABEL_VERSION = "v2_rating_lowstar_fit_quality"
 UNKNOWN_SUBCATEGORY = "unknown"
 UNKNOWN_RANKING_GROUP = "unknown"
+UNKNOWN_QUERY_GROUP = "unknown"
 MIN_FUTURE_REVIEWS = 2
 MIN_GROUP_PRODUCTS = 25
+LOW_STAR_MAX_RATING = 2.0
+HIGH_STAR_MIN_RATING = 4.0
+RECENT_WINDOW_DAYS = 180
+RECENT_WINDOW_MS = RECENT_WINDOW_DAYS * 24 * 60 * 60 * 1000
 NEGATIVE_FIT_KEYWORDS = (
     "too small",
     "too big",
@@ -59,6 +65,55 @@ NEGATIVE_FIT_KEYWORDS = (
     "half size down",
     "not true to size",
 )
+TOO_SMALL_KEYWORDS = (
+    "too small",
+    "runs small",
+    "run small",
+    "way too small",
+    "size up",
+    "sized up",
+    "order a size up",
+    "go a size up",
+    "one size up",
+    "half size up",
+)
+TOO_LARGE_KEYWORDS = (
+    "too big",
+    "too large",
+    "runs large",
+    "run large",
+    "way too big",
+    "way too large",
+    "size down",
+    "sized down",
+    "order a size down",
+    "go a size down",
+    "one size down",
+    "half size down",
+)
+TIGHT_KEYWORDS = ("tight", "too tight", "very tight")
+LOOSE_KEYWORDS = ("loose", "too loose", "very loose")
+QUALITY_COMPLAINT_KEYWORDS = (
+    "poor quality",
+    "bad quality",
+    "quality issue",
+    "poorly made",
+    "cheaply made",
+    "cheap quality",
+    "cheap material",
+    "fell apart",
+    "falling apart",
+    "ripped",
+    "tore",
+    "torn",
+    "broke",
+    "broken",
+    "defective",
+    "itchy",
+    "scratchy",
+    "thin material",
+    "see through",
+)
 NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 WHITESPACE_RE = re.compile(r"\s+")
 
@@ -69,6 +124,36 @@ class SplitSpec:
     history_end: int
     label_start_exclusive: int
     label_end: int
+
+
+def derive_query_group_v2(
+    ranking_group: object,
+    subcategory: object,
+) -> str:
+    ranking_group_value = str(ranking_group or "").strip().lower()
+    subcategory_value = str(subcategory or "").strip().lower()
+
+    if ranking_group_value == "tops":
+        if subcategory_value == "sweater":
+            return "tops_sweater"
+        if subcategory_value in {"t_shirt", "shirt_top"}:
+            return "tops_shirts"
+        return "tops_general"
+
+    if ranking_group_value == "bottoms":
+        if subcategory_value == "pants":
+            return "bottoms_pants"
+        return "bottoms_other"
+
+    if ranking_group_value == "outerwear":
+        return "outerwear"
+    if ranking_group_value == "dress":
+        return "dress"
+    if ranking_group_value == "footwear":
+        return "footwear"
+    if ranking_group_value == "intimates_sleep":
+        return "intimates_sleep"
+    return UNKNOWN_QUERY_GROUP
 
 
 def parse_args() -> argparse.Namespace:
@@ -213,17 +298,28 @@ def build_split_specs(reviews) -> list[SplitSpec]:
     ]
 
 
-def aggregate_history(reviews):
+def aggregate_history(reviews, history_end: int):
     grouped = reviews.groupby("asin", sort=False)
     history = grouped.agg(
         parent_asin=("parent_asin", "first"),
         category=("category", "first"),
         subcategory=("subcategory", "first"),
         ranking_group=("ranking_group", "first"),
+        query_group_v2=("query_group_v2", "first"),
         is_apparel=("is_apparel", "first"),
         mean_rating=("rating", "mean"),
         review_count=("rating", "size"),
         fit_complaint_rate=("is_negative_fit_complaint", "mean"),
+        low_star_rate=("is_low_star", "mean"),
+        high_star_rate=("is_high_star", "mean"),
+        too_small_rate=("is_too_small", "mean"),
+        too_large_rate=("is_too_large", "mean"),
+        tight_rate=("is_tight", "mean"),
+        loose_rate=("is_loose", "mean"),
+        quality_complaint_rate=("is_quality_complaint", "mean"),
+        verified_purchase_rate=("verified_purchase_numeric", "mean"),
+        helpful_votes_mean=("helpful_votes_filled", "mean"),
+        helpful_votes_sum=("helpful_votes_filled", "sum"),
     )
     history["rating_variance"] = grouped["rating"].var(ddof=0).astype(float)
     history = history.reset_index()
@@ -232,6 +328,39 @@ def aggregate_history(reviews):
     history["review_count"] = history["review_count"].astype(int)
     history["log_review_count"] = history["review_count"].map(math.log1p).astype(float)
     history["fit_complaint_rate"] = history["fit_complaint_rate"].astype(float)
+    for column in (
+        "low_star_rate",
+        "high_star_rate",
+        "too_small_rate",
+        "too_large_rate",
+        "tight_rate",
+        "loose_rate",
+        "quality_complaint_rate",
+        "verified_purchase_rate",
+        "helpful_votes_mean",
+    ):
+        history[column] = history[column].astype(float)
+    history["helpful_votes_sum"] = history["helpful_votes_sum"].astype(float)
+    history["helpful_votes_sum_log"] = history["helpful_votes_sum"].map(math.log1p).astype(float)
+    history = history.drop(columns=["helpful_votes_sum"])
+
+    # Use a fixed 180-day lookback anchored to the split's history cutoff so the
+    # recent features remain leakage-safe and comparable across splits.
+    recent_window_start = history_end - RECENT_WINDOW_MS
+    recent = (
+        reviews.loc[reviews["timestamp"] > recent_window_start]
+        .groupby("asin", sort=False)
+        .agg(
+            recent_review_count=("rating", "size"),
+            recent_mean_rating=("rating", "mean"),
+        )
+        .reset_index()
+    )
+    history = history.merge(recent, on="asin", how="left")
+    history["recent_review_count"] = history["recent_review_count"].fillna(0).astype(int)
+    history["recent_mean_rating"] = (
+        history["recent_mean_rating"].fillna(history["mean_rating"]).astype(float)
+    )
     return history
 
 
@@ -240,12 +369,18 @@ def aggregate_future(reviews):
     future = grouped.agg(
         future_mean_rating=("rating", "mean"),
         future_review_count=("rating", "size"),
+        future_low_star_rate=("is_low_star", "mean"),
+        future_high_star_rate=("is_high_star", "mean"),
         future_fit_complaint_rate=("is_negative_fit_complaint", "mean"),
+        future_quality_complaint_rate=("is_quality_complaint", "mean"),
     )
     future = future.reset_index()
     future["future_mean_rating"] = future["future_mean_rating"].astype(float)
     future["future_review_count"] = future["future_review_count"].astype(int)
+    future["future_low_star_rate"] = future["future_low_star_rate"].astype(float)
+    future["future_high_star_rate"] = future["future_high_star_rate"].astype(float)
     future["future_fit_complaint_rate"] = future["future_fit_complaint_rate"].astype(float)
+    future["future_quality_complaint_rate"] = future["future_quality_complaint_rate"].astype(float)
     return future
 
 
@@ -263,6 +398,7 @@ def empty_split_frame():
             "category",
             "subcategory",
             "ranking_group",
+            "query_group_v2",
             "is_apparel",
             "history_end_timestamp",
             "label_start_exclusive_timestamp",
@@ -272,9 +408,25 @@ def empty_split_frame():
             "review_count",
             "log_review_count",
             "fit_complaint_rate",
+            "low_star_rate",
+            "high_star_rate",
+            "too_small_rate",
+            "too_large_rate",
+            "tight_rate",
+            "loose_rate",
+            "quality_complaint_rate",
+            "verified_purchase_rate",
+            "helpful_votes_mean",
+            "helpful_votes_sum_log",
+            "recent_review_count",
+            "recent_mean_rating",
             "future_mean_rating",
+            "future_low_star_rate",
+            "future_high_star_rate",
             "future_fit_complaint_rate",
+            "future_quality_complaint_rate",
             "future_review_count",
+            "target_score_v1",
             "target_score",
         ]
     )
@@ -300,7 +452,7 @@ def build_split_frame(
         if int(label_reviews["timestamp"].max()) > split_spec.label_end:
             raise ValueError(f"Label window end leakage detected in split {split_spec.name}.")
 
-    history = aggregate_history(history_reviews)
+    history = aggregate_history(history_reviews, history_end=split_spec.history_end)
     future = aggregate_future(label_reviews)
 
     if history.empty or future.empty:
@@ -310,8 +462,8 @@ def build_split_frame(
             "products_before_label_filter": 0,
             "products_after_label_filter": 0,
             "output_rows": 0,
-            "eligible_ranking_groups": {},
-            "excluded_ranking_groups": {},
+            "eligible_query_groups": {},
+            "excluded_query_groups": {},
         }
 
     future = future.loc[future["future_review_count"] >= min_future_reviews].copy()
@@ -323,28 +475,35 @@ def build_split_frame(
             "products_before_label_filter": int(len(history)),
             "products_after_label_filter": 0,
             "output_rows": 0,
-            "eligible_ranking_groups": {},
-            "excluded_ranking_groups": {},
+            "eligible_query_groups": {},
+            "excluded_query_groups": {},
         }
 
-    combined["target_score"] = (
+    combined["target_score_v1"] = (
         0.5 * ((combined["future_mean_rating"] - 1.0) / 4.0)
         + 0.5 * (1.0 - combined["future_fit_complaint_rate"])
     ).astype(float)
+    # Label v2 broadens the future weak target beyond rating + generic fit. It
+    # rewards high future satisfaction while explicitly penalizing low-star,
+    # fit-complaint, and quality-complaint outcomes.
+    combined["target_score"] = (
+        0.30 * ((combined["future_mean_rating"] - 1.0) / 4.0)
+        + 0.25 * (1.0 - combined["future_low_star_rate"])
+        + 0.25 * (1.0 - combined["future_fit_complaint_rate"])
+        + 0.20 * (1.0 - combined["future_quality_complaint_rate"])
+    ).astype(float)
 
     products_before_group_filter = len(combined)
-    ranking_group_sizes = combined.groupby("ranking_group")["asin"].size().sort_values(
+    query_group_sizes = combined.groupby("query_group_v2")["asin"].size().sort_values(
         ascending=False
     )
-    eligible_ranking_groups = ranking_group_sizes[
-        ranking_group_sizes >= min_group_products
+    eligible_query_groups = query_group_sizes[
+        query_group_sizes >= min_group_products
     ]
-    excluded_ranking_groups = ranking_group_sizes[
-        ranking_group_sizes < min_group_products
+    excluded_query_groups = query_group_sizes[
+        query_group_sizes < min_group_products
     ]
-    combined = combined.loc[
-        combined["ranking_group"].isin(eligible_ranking_groups.index)
-    ].copy()
+    combined = combined.loc[combined["query_group_v2"].isin(eligible_query_groups.index)].copy()
 
     combined["split"] = split_spec.name
     combined["history_end_timestamp"] = split_spec.history_end
@@ -357,11 +516,11 @@ def build_split_frame(
         "products_before_label_filter": int(len(history)),
         "products_after_label_filter": int(products_before_group_filter),
         "output_rows": int(len(combined)),
-        "eligible_ranking_groups": {
-            key: int(value) for key, value in eligible_ranking_groups.items()
+        "eligible_query_groups": {
+            key: int(value) for key, value in eligible_query_groups.items()
         },
-        "excluded_ranking_groups": {
-            key: int(value) for key, value in excluded_ranking_groups.items()
+        "excluded_query_groups": {
+            key: int(value) for key, value in excluded_query_groups.items()
         },
     }
     return combined, audit
@@ -377,6 +536,8 @@ def print_audit_summary(
     print("Ranking evaluation dataset build complete")
     print(f"Output path: {output_path}")
     print(f"Manifest path: {manifest_path}")
+    print(f"Label version: {manifest['label_version']}")
+    print(f"Query group version: {manifest['query_group_version']}")
 
     print()
     print("Input filtering")
@@ -424,6 +585,7 @@ def print_audit_summary(
         print(f"{split_name.title()} split")
         print(f"  rows: {len(split_frame)}")
         print(f"  unique_asins: {split_frame['asin'].nunique()}")
+        print(f"  query_groups: {split_frame['query_group_v2'].nunique()}")
         print(f"  ranking_groups: {split_frame['ranking_group'].nunique()}")
         print(f"  subcategories: {split_frame['subcategory'].nunique()}")
         print(f"  history_review_rows: {split_manifest['history_review_rows']}")
@@ -446,16 +608,16 @@ def print_audit_summary(
         print(f"    p90: {future_count_stats['p90']:.0f}")
         print(f"    max: {future_count_stats['max']:.0f}")
 
-        print("  eligible_ranking_groups:")
-        for ranking_group, count in split_manifest["eligible_ranking_groups"].items():
-            print(f"    {ranking_group}: {count}")
-        if not split_manifest["eligible_ranking_groups"]:
+        print("  eligible_query_groups:")
+        for query_group, count in split_manifest["eligible_query_groups"].items():
+            print(f"    {query_group}: {count}")
+        if not split_manifest["eligible_query_groups"]:
             print("    (none)")
 
-        print("  excluded_ranking_groups:")
-        for ranking_group, count in split_manifest["excluded_ranking_groups"].items():
-            print(f"    {ranking_group}: {count}")
-        if not split_manifest["excluded_ranking_groups"]:
+        print("  excluded_query_groups:")
+        for query_group, count in split_manifest["excluded_query_groups"].items():
+            print(f"    {query_group}: {count}")
+        if not split_manifest["excluded_query_groups"]:
             print("    (none)")
 
 
@@ -500,6 +662,8 @@ def main() -> int:
                 "rating",
                 "review_text",
                 "timestamp",
+                "verified_purchase",
+                "helpful_votes",
             ],
         )
         taxonomy = pd.read_parquet(
@@ -553,12 +717,27 @@ def main() -> int:
     )
     reviews = reviews.loc[reviews["ranking_group"] != UNKNOWN_RANKING_GROUP].copy()
     reviews_after_ranking_group_filter = int(len(reviews))
+    reviews["query_group_v2"] = [
+        derive_query_group_v2(ranking_group=ranking_group, subcategory=subcategory)
+        for ranking_group, subcategory in zip(
+            reviews["ranking_group"],
+            reviews["subcategory"],
+            strict=True,
+        )
+    ]
 
     if reviews.empty:
         raise ValueError("No reviews remain after filtering to apparel ranking groups.")
+    if (reviews["query_group_v2"] == UNKNOWN_QUERY_GROUP).any():
+        raise ValueError("All retained apparel reviews must resolve to query_group_v2.")
 
-    print("Deriving negative fit complaint flag...")
+    print("Deriving review-level feature flags...")
     negative_fit_pattern = build_keyword_pattern(NEGATIVE_FIT_KEYWORDS)
+    too_small_pattern = build_keyword_pattern(TOO_SMALL_KEYWORDS)
+    too_large_pattern = build_keyword_pattern(TOO_LARGE_KEYWORDS)
+    tight_pattern = build_keyword_pattern(TIGHT_KEYWORDS)
+    loose_pattern = build_keyword_pattern(LOOSE_KEYWORDS)
+    quality_complaint_pattern = build_keyword_pattern(QUALITY_COMPLAINT_KEYWORDS)
     normalized_review_text = (
         reviews["review_text"]
         .fillna("")
@@ -573,6 +752,42 @@ def main() -> int:
         regex=True,
         na=False,
     )
+    reviews["is_too_small"] = normalized_review_text.str.contains(
+        too_small_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_too_large"] = normalized_review_text.str.contains(
+        too_large_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_tight"] = normalized_review_text.str.contains(
+        tight_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_loose"] = normalized_review_text.str.contains(
+        loose_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_quality_complaint"] = normalized_review_text.str.contains(
+        quality_complaint_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_low_star"] = reviews["rating"].astype(float) <= LOW_STAR_MAX_RATING
+    reviews["is_high_star"] = reviews["rating"].astype(float) >= HIGH_STAR_MIN_RATING
+    # Canonical reviews preserve these optional fields for later aggregation.
+    # Missing helpful votes are treated as zero and missing verified_purchase as
+    # false so the product-level rates remain fully defined.
+    reviews["helpful_votes_filled"] = (
+        pd.to_numeric(reviews["helpful_votes"], errors="coerce").fillna(0).astype(float)
+    )
+    reviews["verified_purchase_numeric"] = (
+        reviews["verified_purchase"].fillna(False).astype(bool).astype(float)
+    )
     reviews = reviews.drop(columns=["review_text"])
 
     print("Validating ASIN mappings...")
@@ -580,6 +795,7 @@ def main() -> int:
     validate_one_value_per_asin(reviews, "category")
     validate_one_value_per_asin(reviews, "subcategory")
     validate_one_value_per_asin(reviews, "ranking_group")
+    validate_one_value_per_asin(reviews, "query_group_v2")
 
     # Amazon Reviews 2023 review timestamps are stored as Unix epoch milliseconds.
     # We keep split logic on the raw integers and only format them for auditing.
@@ -637,6 +853,7 @@ def main() -> int:
         "category",
         "subcategory",
         "ranking_group",
+        "query_group_v2",
         "is_apparel",
         "history_end_timestamp",
         "label_start_exclusive_timestamp",
@@ -646,9 +863,25 @@ def main() -> int:
         "review_count",
         "log_review_count",
         "fit_complaint_rate",
+        "low_star_rate",
+        "high_star_rate",
+        "too_small_rate",
+        "too_large_rate",
+        "tight_rate",
+        "loose_rate",
+        "quality_complaint_rate",
+        "verified_purchase_rate",
+        "helpful_votes_mean",
+        "helpful_votes_sum_log",
+        "recent_review_count",
+        "recent_mean_rating",
         "future_mean_rating",
+        "future_low_star_rate",
+        "future_high_star_rate",
         "future_fit_complaint_rate",
+        "future_quality_complaint_rate",
         "future_review_count",
+        "target_score_v1",
         "target_score",
     ]
     dataset = dataset.loc[:, output_columns].copy()
@@ -656,7 +889,8 @@ def main() -> int:
     split_order = {"train": 0, "validation": 1, "test": 2}
     dataset["split_order"] = dataset["split"].map(split_order)
     dataset = dataset.sort_values(
-        ["split_order", "ranking_group", "subcategory", "asin"], kind="stable"
+        ["split_order", "query_group_v2", "ranking_group", "subcategory", "asin"],
+        kind="stable",
     ).drop(columns=["split_order"])
     dataset = dataset.reset_index(drop=True)
 
@@ -670,17 +904,60 @@ def main() -> int:
         raise ValueError("All output rows must have is_apparel = True.")
     if (dataset["ranking_group"] == UNKNOWN_RANKING_GROUP).any():
         raise ValueError("Unknown ranking_group rows must not appear in the output.")
+    if (dataset["query_group_v2"] == UNKNOWN_QUERY_GROUP).any():
+        raise ValueError("Unknown query_group_v2 rows must not appear in the output.")
 
-    for column in ("fit_complaint_rate", "future_fit_complaint_rate", "target_score"):
+    for column in (
+        "fit_complaint_rate",
+        "low_star_rate",
+        "high_star_rate",
+        "too_small_rate",
+        "too_large_rate",
+        "tight_rate",
+        "loose_rate",
+        "quality_complaint_rate",
+        "verified_purchase_rate",
+        "future_low_star_rate",
+        "future_high_star_rate",
+        "future_fit_complaint_rate",
+        "future_quality_complaint_rate",
+        "target_score_v1",
+        "target_score",
+    ):
         invalid = (dataset[column] < 0.0) | (dataset[column] > 1.0)
         if invalid.any():
             raise ValueError(f"{column} must stay within [0, 1].")
+    if (dataset["helpful_votes_mean"] < 0.0).any():
+        raise ValueError("helpful_votes_mean must be non-negative.")
+    if (dataset["helpful_votes_sum_log"] < 0.0).any():
+        raise ValueError("helpful_votes_sum_log must be non-negative.")
+    if (dataset["recent_review_count"] < 0).any():
+        raise ValueError("recent_review_count must be non-negative.")
+    if ((dataset["recent_mean_rating"] < 1.0) | (dataset["recent_mean_rating"] > 5.0)).any():
+        raise ValueError("recent_mean_rating must stay within [1, 5].")
 
-    group_sizes = dataset.groupby(["split", "ranking_group"])["asin"].size()
+    group_sizes = dataset.groupby(["split", "query_group_v2"])["asin"].size()
     if (group_sizes < args.min_group_products).any():
-        raise ValueError("All emitted split/ranking_group groups must meet the size threshold.")
+        raise ValueError("All emitted split/query_group_v2 groups must meet the size threshold.")
 
     manifest = {
+        "label_version": LABEL_VERSION,
+        "query_group_version": "v2_refined_apparel_queries",
+        "query_group_definition": {
+            "tops_sweater": "ranking_group=tops and subcategory=sweater",
+            "tops_shirts": "ranking_group=tops and subcategory in {t_shirt, shirt_top}",
+            "tops_general": "ranking_group=tops and all other fine subcategories",
+            "bottoms_pants": "ranking_group=bottoms and subcategory=pants",
+            "bottoms_other": "ranking_group=bottoms and all other fine subcategories",
+            "dress": "ranking_group=dress",
+            "footwear": "ranking_group=footwear",
+            "intimates_sleep": "ranking_group=intimates_sleep",
+            "outerwear": "ranking_group=outerwear",
+        },
+        "target_definition": {
+            "target_score_v1": "0.5 * normalized_future_mean_rating + 0.5 * (1 - future_fit_complaint_rate)",
+            "target_score": "0.30 * normalized_future_mean_rating + 0.25 * (1 - future_low_star_rate) + 0.25 * (1 - future_fit_complaint_rate) + 0.20 * (1 - future_quality_complaint_rate)",
+        },
         "input_reviews": input_review_count,
         "dropped_missing_timestamp_reviews": dropped_missing_timestamp_reviews,
         "reviews_after_timestamp_filter": reviews_after_timestamp_filter,

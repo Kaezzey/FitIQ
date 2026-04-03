@@ -883,10 +883,17 @@ def discover_input_files(
 def discover_files_under_root(root: Path, category_stems: Iterable[str]) -> list[Path]:
     matches: set[Path] = set()
     for stem in category_stems:
-        candidate_stems = {stem}
-        if not stem.startswith("meta_"):
+        candidate_stems: set[str] = set()
+        if stem.startswith("raw_meta_"):
+            candidate_stems.add(stem)
+        elif stem.startswith("meta_"):
+            candidate_stems.add(stem)
+            candidate_stems.add(f"raw_meta_{stem}")
+        else:
+            # Only match metadata files here. The review files share fields like
+            # parent_asin and title, so accidentally loading them would silently
+            # build a taxonomy from review titles instead of product metadata.
             candidate_stems.add(f"meta_{stem}")
-        if not stem.startswith("raw_meta_"):
             candidate_stems.add(f"raw_meta_{stem}")
 
         for candidate_stem in candidate_stems:
@@ -1233,6 +1240,20 @@ def resolve_field_map(record: dict[str, object], path: Path) -> dict[str, str | 
         raise ValueError(
             f"Unsupported metadata schema in {path}. Missing required source field: parent_asin. "
             f"Available fields: {available}"
+        )
+
+    metadata_signal_fields = (
+        field_map["categories"],
+        field_map["features"],
+        field_map["description"],
+        field_map["main_category"],
+    )
+    if not any(metadata_signal_fields):
+        available = ", ".join(sorted(record.keys()))
+        raise ValueError(
+            "Input does not look like Amazon Reviews 2023 metadata. Expected at least one "
+            "metadata-specific field such as categories, features, description, or "
+            f"main_category in {path}. Available fields: {available}"
         )
     return field_map
 

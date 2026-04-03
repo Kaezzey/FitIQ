@@ -15,9 +15,12 @@ DEFAULT_DATASET_PATH = Path("data/processed/ranking_eval_dataset.parquet")
 DEFAULT_OUTPUT_PATH = Path("evaluation/results/baseline_benchmark_results.json")
 DEFAULT_RANDOM_SEED = 20260401
 DEFAULT_TOPS_MIN_ROWS = 25
+QUERY_GROUP_COLUMN = "query_group_v2"
+RANKING_GROUP_COLUMN = "ranking_group"
 REQUIRED_COLUMNS = {
     "split",
     "asin",
+    "query_group_v2",
     "ranking_group",
     "subcategory",
     "mean_rating",
@@ -39,7 +42,7 @@ CORE_TOPS_SUBCATEGORIES = ("t_shirt", "shirt_top", "sweater", "unknown")
 class BaselineResult:
     name: str
     overall_metrics: dict[str, float]
-    per_ranking_group_metrics: dict[str, dict[str, float]]
+    per_query_group_metrics: dict[str, dict[str, float]]
     tops_diagnostics: dict[str, object]
 
 
@@ -121,7 +124,7 @@ def compute_overall_metrics(frame, score_col: str) -> dict[str, float]:
         "ndcg@10": float(
             ranking_metrics.grouped_ndcg_at_k(
                 frame,
-                group_col="ranking_group",
+                group_col=QUERY_GROUP_COLUMN,
                 truth_col="target_score",
                 score_col=score_col,
                 k=10,
@@ -130,7 +133,7 @@ def compute_overall_metrics(frame, score_col: str) -> dict[str, float]:
         "ndcg@20": float(
             ranking_metrics.grouped_ndcg_at_k(
                 frame,
-                group_col="ranking_group",
+                group_col=QUERY_GROUP_COLUMN,
                 truth_col="target_score",
                 score_col=score_col,
                 k=20,
@@ -139,7 +142,7 @@ def compute_overall_metrics(frame, score_col: str) -> dict[str, float]:
         "spearman": float(
             ranking_metrics.grouped_spearman(
                 frame,
-                group_col="ranking_group",
+                group_col=QUERY_GROUP_COLUMN,
                 truth_col="target_score",
                 score_col=score_col,
             )
@@ -147,12 +150,12 @@ def compute_overall_metrics(frame, score_col: str) -> dict[str, float]:
     }
 
 
-def compute_per_ranking_group_metrics(frame, score_col: str) -> dict[str, dict[str, float]]:
+def compute_per_query_group_metrics(frame, score_col: str) -> dict[str, dict[str, float]]:
     metrics: dict[str, dict[str, float]] = {}
-    for ranking_group, group_frame in frame.groupby("ranking_group", sort=True):
+    for query_group, group_frame in frame.groupby(QUERY_GROUP_COLUMN, sort=True):
         truth = group_frame["target_score"].astype(float).tolist()
         scores = group_frame[score_col].astype(float).tolist()
-        metrics[str(ranking_group)] = {
+        metrics[str(query_group)] = {
             "row_count": int(len(group_frame)),
             "unique_asins": int(group_frame["asin"].nunique()),
             "ndcg@10": float(ranking_metrics.ndcg_at_k(truth, scores, k=10)),
@@ -163,7 +166,7 @@ def compute_per_ranking_group_metrics(frame, score_col: str) -> dict[str, dict[s
 
 
 def compute_tops_diagnostics(frame, score_col: str, min_subcategory_rows: int) -> dict[str, object]:
-    tops = frame.loc[frame["ranking_group"] == "tops"].copy()
+    tops = frame.loc[frame[RANKING_GROUP_COLUMN] == "tops"].copy()
     fine_counts = {key: 0 for key in CORE_TOPS_SUBCATEGORIES}
     metric_slices: dict[str, dict[str, float]] = {}
     skipped_metric_slices: dict[str, int] = {}
@@ -210,7 +213,7 @@ def evaluate_split(frame, min_subcategory_rows: int) -> dict[str, BaselineResult
         split_results[baseline_name] = BaselineResult(
             name=baseline_name,
             overall_metrics=compute_overall_metrics(frame, score_col=baseline_name),
-            per_ranking_group_metrics=compute_per_ranking_group_metrics(
+            per_query_group_metrics=compute_per_query_group_metrics(
                 frame, score_col=baseline_name
             ),
             tops_diagnostics=compute_tops_diagnostics(
@@ -253,7 +256,17 @@ def serialize_results(
     split_group_counts = {
         split_name: {
             str(group): int(count)
-            for group, count in frame.loc[frame["split"] == split_name, "ranking_group"]
+            for group, count in frame.loc[frame["split"] == split_name, QUERY_GROUP_COLUMN]
+            .value_counts()
+            .sort_index()
+            .items()
+        }
+        for split_name in ("train", "validation", "test")
+    }
+    split_ranking_group_counts = {
+        split_name: {
+            str(group): int(count)
+            for group, count in frame.loc[frame["split"] == split_name, RANKING_GROUP_COLUMN]
             .value_counts()
             .sort_index()
             .items()
@@ -275,12 +288,13 @@ def serialize_results(
     for split_name, baseline_results in results_by_split.items():
         serialized_splits[split_name] = {
             "row_count": split_row_counts[split_name],
-            "ranking_group_counts": split_group_counts[split_name],
+            "query_group_counts": split_group_counts[split_name],
+            "ranking_group_counts": split_ranking_group_counts[split_name],
             "subcategory_counts": split_subcategory_counts[split_name],
             "baselines": {
                 baseline_name: {
                     "overall_metrics": result.overall_metrics,
-                    "per_ranking_group_metrics": result.per_ranking_group_metrics,
+                    "per_query_group_metrics": result.per_query_group_metrics,
                     "tops_diagnostics": result.tops_diagnostics,
                 }
                 for baseline_name, result in baseline_results.items()
@@ -295,7 +309,8 @@ def serialize_results(
         "dataset_summary": {
             "total_rows": int(len(frame)),
             "unique_asins": int(frame["asin"].nunique()),
-            "ranking_groups": sorted(frame["ranking_group"].dropna().astype(str).unique().tolist()),
+            "query_groups": sorted(frame[QUERY_GROUP_COLUMN].dropna().astype(str).unique().tolist()),
+            "ranking_groups": sorted(frame[RANKING_GROUP_COLUMN].dropna().astype(str).unique().tolist()),
             "splits": split_row_counts,
         },
         "summary_rows": build_summary_rows(results_by_split),
@@ -309,7 +324,11 @@ def print_split_summary(split_name: str, result_bundle: dict[str, BaselineResult
     print(f"{split_name.title()} split")
     print(f"  rows: {len(split_frame)}")
     print(f"  unique_asins: {split_frame['asin'].nunique()}")
-    ranking_group_counts = split_frame["ranking_group"].value_counts().sort_index()
+    query_group_counts = split_frame[QUERY_GROUP_COLUMN].value_counts().sort_index()
+    print("  query_group_counts:")
+    for query_group, count in query_group_counts.items():
+        print(f"    {query_group}: {int(count)}")
+    ranking_group_counts = split_frame[RANKING_GROUP_COLUMN].value_counts().sort_index()
     print("  ranking_group_counts:")
     for ranking_group, count in ranking_group_counts.items():
         print(f"    {ranking_group}: {int(count)}")

@@ -1,6 +1,17 @@
 {
   "dataset_path": "C:\\Users\\niket\\OneDrive\\Desktop\\Coding\\ML\\FitIQ\\data\\processed\\ranking_eval_dataset.parquet",
   "dataset_summary": {
+    "query_groups": [
+      "bottoms_other",
+      "bottoms_pants",
+      "dress",
+      "footwear",
+      "intimates_sleep",
+      "outerwear",
+      "tops_general",
+      "tops_shirts",
+      "tops_sweater"
+    ],
     "ranking_groups": [
       "bottoms",
       "dress",
@@ -10,1354 +21,1742 @@
       "tops"
     ],
     "splits": {
-      "test": 1099,
-      "train": 2162,
-      "validation": 1500
+      "test": 6935,
+      "train": 13034,
+      "validation": 9536
     },
-    "total_rows": 4761,
-    "unique_asins": 4035
+    "total_rows": 29505,
+    "unique_asins": 24340
   },
-  "generated_at_utc": "2026-04-01T10:18:48.379007+00:00",
+  "generated_at_utc": "2026-04-03T13:54:55.594724+00:00",
   "random_seed": 20260401,
   "splits": {
     "test": {
       "baselines": {
         "blended_score": {
           "overall_metrics": {
-            "ndcg@10": 0.8562244320575324,
-            "ndcg@20": 0.8354385531940117,
-            "spearman": 0.1731979799695124
+            "ndcg@10": 0.9016119970013848,
+            "ndcg@20": 0.8950226564614933,
+            "spearman": 0.2464575177198624
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.8002399691805575,
-              "ndcg@20": 0.7791188973416565,
-              "row_count": 187,
-              "spearman": 0.16399911711819182,
-              "unique_asins": 187
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.8701784555342613,
+              "ndcg@20": 0.8787071367915745,
+              "row_count": 526,
+              "spearman": 0.22996610920657662,
+              "unique_asins": 526
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.8603964623377529,
+              "ndcg@20": 0.8392690728948762,
+              "row_count": 644,
+              "spearman": 0.18474109320821602,
+              "unique_asins": 644
             },
             "dress": {
-              "ndcg@10": 0.8654433600284832,
-              "ndcg@20": 0.849904177846256,
-              "row_count": 196,
-              "spearman": 0.2562072035802342,
-              "unique_asins": 196
+              "ndcg@10": 0.9519357022450405,
+              "ndcg@20": 0.9274893616471512,
+              "row_count": 675,
+              "spearman": 0.293246923543917,
+              "unique_asins": 675
             },
             "footwear": {
-              "ndcg@10": 0.9230792127669266,
-              "ndcg@20": 0.9192854510301477,
-              "row_count": 82,
-              "spearman": 0.2879759073792834,
-              "unique_asins": 82
+              "ndcg@10": 0.9125386243130913,
+              "ndcg@20": 0.9131342394062143,
+              "row_count": 811,
+              "spearman": 0.18262441648484146,
+              "unique_asins": 811
             },
             "intimates_sleep": {
-              "ndcg@10": 0.7249780884335828,
-              "ndcg@20": 0.7476645611021915,
-              "row_count": 101,
-              "spearman": 0.04733883119840784,
-              "unique_asins": 101
+              "ndcg@10": 0.9246123579680562,
+              "ndcg@20": 0.9237236254422144,
+              "row_count": 269,
+              "spearman": 0.23006574119635118,
+              "unique_asins": 269
             },
             "outerwear": {
-              "ndcg@10": 0.8702312636151083,
-              "ndcg@20": 0.834099507277926,
-              "row_count": 139,
-              "spearman": 0.15564152112614832,
-              "unique_asins": 139
+              "ndcg@10": 0.8935780323787206,
+              "ndcg@20": 0.8939305969401069,
+              "row_count": 309,
+              "spearman": 0.2993978634078487,
+              "unique_asins": 309
             },
-            "tops": {
-              "ndcg@10": 0.9533746983205355,
-              "ndcg@20": 0.8825587245658922,
-              "row_count": 394,
-              "spearman": 0.1280252994148088,
-              "unique_asins": 394
+            "tops_general": {
+              "ndcg@10": 0.9004244535671709,
+              "ndcg@20": 0.9229123591830544,
+              "row_count": 1553,
+              "spearman": 0.32295601282347275,
+              "unique_asins": 1553
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.9392309330873148,
+              "ndcg@20": 0.8905790812776,
+              "row_count": 1189,
+              "spearman": 0.22691668571017173,
+              "unique_asins": 1189
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.8616129515810553,
+              "ndcg@20": 0.8654584345706472,
+              "row_count": 959,
+              "spearman": 0.24820281389736618,
+              "unique_asins": 959
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 10,
-              "sweater": 81,
-              "t_shirt": 44,
-              "unknown": 259
+              "shirt_top": 739,
+              "sweater": 959,
+              "t_shirt": 450,
+              "unknown": 1553
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.9409944774782135,
+                "ndcg@20": 0.8945977582897825,
+                "row_count": 739,
+                "spearman": 0.2194163416122024
+              },
               "sweater": {
-                "ndcg@10": 0.8242050313137014,
-                "ndcg@20": 0.861378589662477,
-                "row_count": 81,
-                "spearman": 0.19716519428755996
+                "ndcg@10": 0.8616129515810553,
+                "ndcg@20": 0.8654584345706472,
+                "row_count": 959,
+                "spearman": 0.24820281389736618
               },
               "t_shirt": {
-                "ndcg@10": 0.9096758263321675,
-                "ndcg@20": 0.8814852981369443,
-                "row_count": 44,
-                "spearman": 0.15682494294735258
+                "ndcg@10": 0.9014032269654718,
+                "ndcg@20": 0.8768025178991588,
+                "row_count": 450,
+                "spearman": 0.22717632984262437
               },
               "unknown": {
-                "ndcg@10": 0.9249472489929993,
-                "ndcg@20": 0.8357127539771764,
-                "row_count": 259,
-                "spearman": 0.07945435402097895
+                "ndcg@10": 0.9004244535671709,
+                "ndcg@20": 0.9229123591830544,
+                "row_count": 1553,
+                "spearman": 0.32295601282347275
               }
             },
-            "row_count": 394,
-            "skipped_metric_slices": {
-              "shirt_top": 10
-            }
+            "row_count": 3701,
+            "skipped_metric_slices": {}
           }
         },
         "fit_score": {
           "overall_metrics": {
-            "ndcg@10": 0.8580744666147718,
-            "ndcg@20": 0.8399303872786827,
-            "spearman": 0.07377104181497289
+            "ndcg@10": 0.8365337502588129,
+            "ndcg@20": 0.83122347926453,
+            "spearman": 0.06400278524103983
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.8044652074269748,
-              "ndcg@20": 0.8037275048231566,
-              "row_count": 187,
-              "spearman": 0.09884070006520568,
-              "unique_asins": 187
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.8637316331439848,
+              "ndcg@20": 0.8586452146424494,
+              "row_count": 526,
+              "spearman": 0.08403623351216678,
+              "unique_asins": 526
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.6622650498788724,
+              "ndcg@20": 0.7031840986511961,
+              "row_count": 644,
+              "spearman": 0.015693267588330923,
+              "unique_asins": 644
             },
             "dress": {
-              "ndcg@10": 0.8918585025517205,
-              "ndcg@20": 0.8661715098492944,
-              "row_count": 196,
-              "spearman": 0.032348272897114054,
-              "unique_asins": 196
+              "ndcg@10": 0.8493735792268301,
+              "ndcg@20": 0.8077081305717666,
+              "row_count": 675,
+              "spearman": 0.04167041154883611,
+              "unique_asins": 675
             },
             "footwear": {
-              "ndcg@10": 0.9037160525886281,
-              "ndcg@20": 0.8940471214067832,
-              "row_count": 82,
-              "spearman": 0.27795915878290556,
-              "unique_asins": 82
+              "ndcg@10": 0.8426377698622359,
+              "ndcg@20": 0.8530218174211938,
+              "row_count": 811,
+              "spearman": 0.0767065206079174,
+              "unique_asins": 811
             },
             "intimates_sleep": {
-              "ndcg@10": 0.8796698963468014,
-              "ndcg@20": 0.8263706821739634,
-              "row_count": 101,
-              "spearman": 0.0017081922381938616,
-              "unique_asins": 101
+              "ndcg@10": 0.8983117274357172,
+              "ndcg@20": 0.8646262204825642,
+              "row_count": 269,
+              "spearman": 0.0886684481443451,
+              "unique_asins": 269
             },
             "outerwear": {
-              "ndcg@10": 0.8840698660872862,
-              "ndcg@20": 0.8687283910702362,
-              "row_count": 139,
-              "spearman": 0.037438790498561345,
-              "unique_asins": 139
+              "ndcg@10": 0.8603657292252312,
+              "ndcg@20": 0.8699673724360102,
+              "row_count": 309,
+              "spearman": 0.11201809294664866,
+              "unique_asins": 309
             },
-            "tops": {
-              "ndcg@10": 0.7846672746872195,
-              "ndcg@20": 0.7805371143486629,
-              "row_count": 394,
-              "spearman": -0.005668863592143201,
-              "unique_asins": 394
+            "tops_general": {
+              "ndcg@10": 0.9164784611116303,
+              "ndcg@20": 0.8658335823308629,
+              "row_count": 1553,
+              "spearman": 0.12940770766005216,
+              "unique_asins": 1553
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.685937219974842,
+              "ndcg@20": 0.7430300305856002,
+              "row_count": 1189,
+              "spearman": 0.03941447824903957,
+              "unique_asins": 1189
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.9497025824699719,
+              "ndcg@20": 0.9149948462591262,
+              "row_count": 959,
+              "spearman": -0.011590093087978152,
+              "unique_asins": 959
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 10,
-              "sweater": 81,
-              "t_shirt": 44,
-              "unknown": 259
+              "shirt_top": 739,
+              "sweater": 959,
+              "t_shirt": 450,
+              "unknown": 1553
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.685937219974842,
+                "ndcg@20": 0.7430300305856002,
+                "row_count": 739,
+                "spearman": 0.05509960336204425
+              },
               "sweater": {
-                "ndcg@10": 0.8307370398987249,
-                "ndcg@20": 0.8201661019722656,
-                "row_count": 81,
-                "spearman": 0.05520743712687447
+                "ndcg@10": 0.9497025824699719,
+                "ndcg@20": 0.9149948462591262,
+                "row_count": 959,
+                "spearman": -0.011590093087978152
               },
               "t_shirt": {
-                "ndcg@10": 0.9131303210149235,
-                "ndcg@20": 0.9028495920629867,
-                "row_count": 44,
-                "spearman": 0.11920357797057739
+                "ndcg@10": 0.7261269628334099,
+                "ndcg@20": 0.7499917262359002,
+                "row_count": 450,
+                "spearman": 0.0011566417673150153
               },
               "unknown": {
-                "ndcg@10": 0.7348754027137372,
-                "ndcg@20": 0.7719441334839833,
-                "row_count": 259,
-                "spearman": -0.06710022394220665
+                "ndcg@10": 0.9164784611116303,
+                "ndcg@20": 0.8658335823308629,
+                "row_count": 1553,
+                "spearman": 0.12940770766005216
               }
             },
-            "row_count": 394,
-            "skipped_metric_slices": {
-              "shirt_top": 10
-            }
+            "row_count": 3701,
+            "skipped_metric_slices": {}
           }
         },
         "mean_rating_score": {
           "overall_metrics": {
-            "ndcg@10": 0.8115563010248574,
-            "ndcg@20": 0.811455240177494,
-            "spearman": 0.17646049062396477
+            "ndcg@10": 0.8319927650187218,
+            "ndcg@20": 0.8378837032363895,
+            "spearman": 0.23939269801103735
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.6989000145171224,
-              "ndcg@20": 0.7562739913224673,
-              "row_count": 187,
-              "spearman": 0.16282451199583717,
-              "unique_asins": 187
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.7498172082135334,
+              "ndcg@20": 0.7675231812000765,
+              "row_count": 526,
+              "spearman": 0.2362506917972381,
+              "unique_asins": 526
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.7978206975512389,
+              "ndcg@20": 0.7932532150137779,
+              "row_count": 644,
+              "spearman": 0.2061788772881377,
+              "unique_asins": 644
             },
             "dress": {
-              "ndcg@10": 0.844475644453511,
-              "ndcg@20": 0.851528001116444,
-              "row_count": 196,
-              "spearman": 0.2876265166514327,
-              "unique_asins": 196
+              "ndcg@10": 0.829901432150402,
+              "ndcg@20": 0.8539018100826254,
+              "row_count": 675,
+              "spearman": 0.28861904878609945,
+              "unique_asins": 675
             },
             "footwear": {
-              "ndcg@10": 0.9033885512513306,
-              "ndcg@20": 0.8563938038696134,
-              "row_count": 82,
-              "spearman": 0.2536099791062946,
-              "unique_asins": 82
+              "ndcg@10": 0.8684907217348685,
+              "ndcg@20": 0.8458750747754146,
+              "row_count": 811,
+              "spearman": 0.1315201797315229,
+              "unique_asins": 811
             },
             "intimates_sleep": {
-              "ndcg@10": 0.7392000314230459,
-              "ndcg@20": 0.7707182465148182,
-              "row_count": 101,
-              "spearman": 0.19095519303526592,
-              "unique_asins": 101
+              "ndcg@10": 0.7489089206153824,
+              "ndcg@20": 0.795473745686114,
+              "row_count": 269,
+              "spearman": 0.2514932096975621,
+              "unique_asins": 269
             },
             "outerwear": {
-              "ndcg@10": 0.9000016625850626,
-              "ndcg@20": 0.8431896909914692,
-              "row_count": 139,
-              "spearman": -0.0019347083459177708,
-              "unique_asins": 139
+              "ndcg@10": 0.898761474056433,
+              "ndcg@20": 0.8864785227926582,
+              "row_count": 309,
+              "spearman": 0.26320132796755447,
+              "unique_asins": 309
             },
-            "tops": {
-              "ndcg@10": 0.7833719019190721,
-              "ndcg@20": 0.7906277072501523,
-              "row_count": 394,
-              "spearman": 0.16568145130087594,
-              "unique_asins": 394
+            "tops_general": {
+              "ndcg@10": 0.9228721808160227,
+              "ndcg@20": 0.9183996077209037,
+              "row_count": 1553,
+              "spearman": 0.29527154668717676,
+              "unique_asins": 1553
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.809901053149976,
+              "ndcg@20": 0.8129621722763913,
+              "row_count": 1189,
+              "spearman": 0.2600782084775862,
+              "unique_asins": 1189
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.8614611968806395,
+              "ndcg@20": 0.867085999579544,
+              "row_count": 959,
+              "spearman": 0.22192119166645868,
+              "unique_asins": 959
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 10,
-              "sweater": 81,
-              "t_shirt": 44,
-              "unknown": 259
+              "shirt_top": 739,
+              "sweater": 959,
+              "t_shirt": 450,
+              "unknown": 1553
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.809901053149976,
+                "ndcg@20": 0.8129621722763913,
+                "row_count": 739,
+                "spearman": 0.23941555688542884
+              },
               "sweater": {
-                "ndcg@10": 0.8169930600502929,
-                "ndcg@20": 0.8164113417430967,
-                "row_count": 81,
-                "spearman": 0.18606953395722486
+                "ndcg@10": 0.8614611968806395,
+                "ndcg@20": 0.867085999579544,
+                "row_count": 959,
+                "spearman": 0.22192119166645868
               },
               "t_shirt": {
-                "ndcg@10": 0.888883992198783,
-                "ndcg@20": 0.8679780764057072,
-                "row_count": 44,
-                "spearman": 0.10582805435103301
+                "ndcg@10": 0.7721343756392987,
+                "ndcg@20": 0.8332409771253287,
+                "row_count": 450,
+                "spearman": 0.2794974725373876
               },
               "unknown": {
-                "ndcg@10": 0.8147359221460934,
-                "ndcg@20": 0.8234856778841645,
-                "row_count": 259,
-                "spearman": 0.1483195905065695
+                "ndcg@10": 0.9228721808160227,
+                "ndcg@20": 0.9183996077209037,
+                "row_count": 1553,
+                "spearman": 0.29527154668717676
               }
             },
-            "row_count": 394,
-            "skipped_metric_slices": {
-              "shirt_top": 10
-            }
+            "row_count": 3701,
+            "skipped_metric_slices": {}
           }
         },
         "random_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7773088201430998,
-            "ndcg@20": 0.7910144322336023,
-            "spearman": 0.026765841392659574
+            "ndcg@10": 0.7899546275342014,
+            "ndcg@20": 0.782917451179415,
+            "spearman": 0.0005433803821416011
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.667167304928459,
-              "ndcg@20": 0.6920149938697832,
-              "row_count": 187,
-              "spearman": -0.04813522111364147,
-              "unique_asins": 187
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.7639469129174828,
+              "ndcg@20": 0.797859011258194,
+              "row_count": 526,
+              "spearman": -0.034870484826435545,
+              "unique_asins": 526
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.8916852624244832,
+              "ndcg@20": 0.7910253679321362,
+              "row_count": 644,
+              "spearman": -0.024669820359256838,
+              "unique_asins": 644
             },
             "dress": {
-              "ndcg@10": 0.83521575034774,
-              "ndcg@20": 0.8137647992927469,
-              "row_count": 196,
-              "spearman": -0.01874729381092382,
-              "unique_asins": 196
+              "ndcg@10": 0.7715786359420648,
+              "ndcg@20": 0.7415059766773366,
+              "row_count": 675,
+              "spearman": -0.06232037734622198,
+              "unique_asins": 675
             },
             "footwear": {
-              "ndcg@10": 0.7450952927510758,
-              "ndcg@20": 0.7991931139619595,
-              "row_count": 82,
-              "spearman": 0.08272576849084841,
-              "unique_asins": 82
+              "ndcg@10": 0.86618997513623,
+              "ndcg@20": 0.8488148671192647,
+              "row_count": 811,
+              "spearman": 0.05103394072632365,
+              "unique_asins": 811
             },
             "intimates_sleep": {
-              "ndcg@10": 0.808079623896305,
-              "ndcg@20": 0.7923481530567675,
-              "row_count": 101,
-              "spearman": 0.006399806691111495,
-              "unique_asins": 101
+              "ndcg@10": 0.6976644618955425,
+              "ndcg@20": 0.7654219380798517,
+              "row_count": 269,
+              "spearman": 0.06546793382229243,
+              "unique_asins": 269
             },
             "outerwear": {
-              "ndcg@10": 0.8201459028840089,
-              "ndcg@20": 0.8487908223157467,
-              "row_count": 139,
-              "spearman": 0.20434354604544475,
-              "unique_asins": 139
+              "ndcg@10": 0.823543195498603,
+              "ndcg@20": 0.7974673042679109,
+              "row_count": 309,
+              "spearman": 0.05012568197567936,
+              "unique_asins": 309
             },
-            "tops": {
-              "ndcg@10": 0.7881490460510099,
-              "ndcg@20": 0.7999747109046108,
-              "row_count": 394,
-              "spearman": -0.0659915579468819,
-              "unique_asins": 394
+            "tops_general": {
+              "ndcg@10": 0.8147334859948746,
+              "ndcg@20": 0.8127659338062602,
+              "row_count": 1553,
+              "spearman": -0.024710507164278587,
+              "unique_asins": 1553
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.7749472793349719,
+              "ndcg@20": 0.7812686394292274,
+              "row_count": 1189,
+              "spearman": -0.02678810931034503,
+              "unique_asins": 1189
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.7053024386635598,
+              "ndcg@20": 0.710128022044553,
+              "row_count": 959,
+              "spearman": 0.011622165921516943,
+              "unique_asins": 959
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 10,
-              "sweater": 81,
-              "t_shirt": 44,
-              "unknown": 259
+              "shirt_top": 739,
+              "sweater": 959,
+              "t_shirt": 450,
+              "unknown": 1553
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.8489291042497984,
+                "ndcg@20": 0.7806180684518338,
+                "row_count": 739,
+                "spearman": -0.06942942595857823
+              },
               "sweater": {
-                "ndcg@10": 0.7176389081010203,
-                "ndcg@20": 0.7110777403871904,
-                "row_count": 81,
-                "spearman": -0.10612829196697536
+                "ndcg@10": 0.7053024386635598,
+                "ndcg@20": 0.710128022044553,
+                "row_count": 959,
+                "spearman": 0.011622165921516943
               },
               "t_shirt": {
-                "ndcg@10": 0.8666825445749696,
-                "ndcg@20": 0.8964754738322178,
-                "row_count": 44,
-                "spearman": 0.09031854506369806
+                "ndcg@10": 0.7503305700412337,
+                "ndcg@20": 0.7705947512272904,
+                "row_count": 450,
+                "spearman": 0.05205556327011411
               },
               "unknown": {
-                "ndcg@10": 0.7959950811375567,
-                "ndcg@20": 0.7828252886912778,
-                "row_count": 259,
-                "spearman": -0.09606506711376178
+                "ndcg@10": 0.8147334859948746,
+                "ndcg@20": 0.8127659338062602,
+                "row_count": 1553,
+                "spearman": -0.024710507164278587
               }
             },
-            "row_count": 394,
-            "skipped_metric_slices": {
-              "shirt_top": 10
-            }
+            "row_count": 3701,
+            "skipped_metric_slices": {}
           }
         },
         "review_volume_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7778588242313008,
-            "ndcg@20": 0.7791983618994638,
-            "spearman": 0.025387354537965385
+            "ndcg@10": 0.77981550550297,
+            "ndcg@20": 0.7838042080037051,
+            "spearman": 0.06255659465030922
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.7787158271037805,
-              "ndcg@20": 0.7533183012118753,
-              "row_count": 187,
-              "spearman": 0.08617377719018843,
-              "unique_asins": 187
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.8433324839423999,
+              "ndcg@20": 0.7989970923042236,
+              "row_count": 526,
+              "spearman": 0.03936795756323785,
+              "unique_asins": 526
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.7864641058226991,
+              "ndcg@20": 0.764074710501085,
+              "row_count": 644,
+              "spearman": 0.03698150960677062,
+              "unique_asins": 644
             },
             "dress": {
-              "ndcg@10": 0.8773070810936686,
-              "ndcg@20": 0.8375219761683711,
-              "row_count": 196,
-              "spearman": -0.028260868713565736,
-              "unique_asins": 196
+              "ndcg@10": 0.6838887062027722,
+              "ndcg@20": 0.7243228723429745,
+              "row_count": 675,
+              "spearman": 0.07170471903905055,
+              "unique_asins": 675
             },
             "footwear": {
-              "ndcg@10": 0.6215827144010109,
-              "ndcg@20": 0.6828468644145664,
-              "row_count": 82,
-              "spearman": -0.22168189611683756,
-              "unique_asins": 82
+              "ndcg@10": 0.6990023570447876,
+              "ndcg@20": 0.7214700891620355,
+              "row_count": 811,
+              "spearman": 0.08321106694383769,
+              "unique_asins": 811
             },
             "intimates_sleep": {
-              "ndcg@10": 0.7452422021888652,
-              "ndcg@20": 0.7613853427487735,
-              "row_count": 101,
-              "spearman": 0.016039121356331267,
-              "unique_asins": 101
+              "ndcg@10": 0.7754398284290037,
+              "ndcg@20": 0.7703440082102647,
+              "row_count": 269,
+              "spearman": 0.05158743479630691,
+              "unique_asins": 269
             },
             "outerwear": {
-              "ndcg@10": 0.899561392775318,
-              "ndcg@20": 0.8672483825167269,
-              "row_count": 139,
-              "spearman": 0.2590943345218391,
-              "unique_asins": 139
+              "ndcg@10": 0.8266633723861682,
+              "ndcg@20": 0.8386995185795623,
+              "row_count": 309,
+              "spearman": 0.052453836359670505,
+              "unique_asins": 309
             },
-            "tops": {
-              "ndcg@10": 0.7447437278251624,
-              "ndcg@20": 0.7728693043364697,
-              "row_count": 394,
-              "spearman": 0.040959658989836806,
-              "unique_asins": 394
+            "tops_general": {
+              "ndcg@10": 0.7995335948327562,
+              "ndcg@20": 0.7981248114471472,
+              "row_count": 1553,
+              "spearman": 0.05424876583228134,
+              "unique_asins": 1553
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.7500724771434195,
+              "ndcg@20": 0.7660833587859293,
+              "row_count": 1189,
+              "spearman": 0.05053219151239641,
+              "unique_asins": 1189
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.8539426237227233,
+              "ndcg@20": 0.8721214107001233,
+              "row_count": 959,
+              "spearman": 0.12292187019923118,
+              "unique_asins": 959
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 10,
-              "sweater": 81,
-              "t_shirt": 44,
-              "unknown": 259
+              "shirt_top": 739,
+              "sweater": 959,
+              "t_shirt": 450,
+              "unknown": 1553
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.7512134759561797,
+                "ndcg@20": 0.7639105811554612,
+                "row_count": 739,
+                "spearman": 0.05434953804076717
+              },
               "sweater": {
-                "ndcg@10": 0.9022469803667403,
-                "ndcg@20": 0.850305286217023,
-                "row_count": 81,
-                "spearman": 0.05624183910937105
+                "ndcg@10": 0.8539426237227233,
+                "ndcg@20": 0.8721214107001233,
+                "row_count": 959,
+                "spearman": 0.12292187019923118
               },
               "t_shirt": {
-                "ndcg@10": 0.8883539727006754,
-                "ndcg@20": 0.8601647524613039,
-                "row_count": 44,
-                "spearman": 0.058201891168921265
+                "ndcg@10": 0.9095770371837052,
+                "ndcg@20": 0.9054621164213341,
+                "row_count": 450,
+                "spearman": 0.057110691522676116
               },
               "unknown": {
-                "ndcg@10": 0.7447437278251624,
-                "ndcg@20": 0.7728693043364697,
-                "row_count": 259,
-                "spearman": 0.012840962173366686
+                "ndcg@10": 0.7995335948327562,
+                "ndcg@20": 0.7981248114471472,
+                "row_count": 1553,
+                "spearman": 0.05424876583228134
               }
             },
-            "row_count": 394,
-            "skipped_metric_slices": {
-              "shirt_top": 10
-            }
+            "row_count": 3701,
+            "skipped_metric_slices": {}
           }
         }
       },
-      "ranking_group_counts": {
-        "bottoms": 187,
-        "dress": 196,
-        "footwear": 82,
-        "intimates_sleep": 101,
-        "outerwear": 139,
-        "tops": 394
+      "query_group_counts": {
+        "bottoms_other": 526,
+        "bottoms_pants": 644,
+        "dress": 675,
+        "footwear": 811,
+        "intimates_sleep": 269,
+        "outerwear": 309,
+        "tops_general": 1553,
+        "tops_shirts": 1189,
+        "tops_sweater": 959
       },
-      "row_count": 1099,
+      "ranking_group_counts": {
+        "bottoms": 1170,
+        "dress": 675,
+        "footwear": 811,
+        "intimates_sleep": 269,
+        "outerwear": 309,
+        "tops": 3701
+      },
+      "row_count": 6935,
       "subcategory_counts": {
-        "dress": 196,
-        "jacket": 139,
-        "pants": 149,
-        "shirt_top": 10,
-        "shoes": 81,
-        "skirt": 24,
-        "sweater": 81,
-        "t_shirt": 44,
-        "underwear_sleepwear": 101,
-        "unknown": 274
+        "dress": 385,
+        "jacket": 205,
+        "pants": 644,
+        "shirt_top": 739,
+        "shoes": 593,
+        "skirt": 74,
+        "sweater": 959,
+        "t_shirt": 450,
+        "underwear_sleepwear": 242,
+        "unknown": 2644
       }
     },
     "train": {
       "baselines": {
         "blended_score": {
           "overall_metrics": {
-            "ndcg@10": 0.8894149515792048,
-            "ndcg@20": 0.8793801861933775,
-            "spearman": 0.2378063597093156
+            "ndcg@10": 0.8997371729401452,
+            "ndcg@20": 0.8983909752249235,
+            "spearman": 0.25668485721313467
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.8340279253367412,
-              "ndcg@20": 0.8126463516487145,
-              "row_count": 313,
-              "spearman": 0.25772550661916116,
-              "unique_asins": 313
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.9537726192460598,
+              "ndcg@20": 0.9601177346498707,
+              "row_count": 1256,
+              "spearman": 0.32625230982108416,
+              "unique_asins": 1256
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.8259015415517683,
+              "ndcg@20": 0.8366603856937024,
+              "row_count": 889,
+              "spearman": 0.19625359014315444,
+              "unique_asins": 889
             },
             "dress": {
-              "ndcg@10": 0.9163060922331296,
-              "ndcg@20": 0.9003919612289376,
-              "row_count": 842,
-              "spearman": 0.22422241330167736,
-              "unique_asins": 842
+              "ndcg@10": 0.8716603825999973,
+              "ndcg@20": 0.8586859046570123,
+              "row_count": 1878,
+              "spearman": 0.19362676547392987,
+              "unique_asins": 1878
             },
             "footwear": {
-              "ndcg@10": 0.8729506908714033,
-              "ndcg@20": 0.8784868113246588,
-              "row_count": 193,
-              "spearman": 0.12146399790002357,
-              "unique_asins": 193
+              "ndcg@10": 0.8718733658466701,
+              "ndcg@20": 0.9014700772183035,
+              "row_count": 1196,
+              "spearman": 0.24526880895907063,
+              "unique_asins": 1196
             },
             "intimates_sleep": {
-              "ndcg@10": 0.9194577650743454,
-              "ndcg@20": 0.9312052177778719,
-              "row_count": 126,
-              "spearman": 0.40165965427901357,
-              "unique_asins": 126
+              "ndcg@10": 0.8653809995338658,
+              "ndcg@20": 0.863172950816495,
+              "row_count": 702,
+              "spearman": 0.2796332716575279,
+              "unique_asins": 702
             },
             "outerwear": {
-              "ndcg@10": 0.8765664829912844,
-              "ndcg@20": 0.8502841293653661,
-              "row_count": 79,
-              "spearman": 0.21513179503978666,
-              "unique_asins": 79
+              "ndcg@10": 0.9492836645263122,
+              "ndcg@20": 0.9446183325492383,
+              "row_count": 479,
+              "spearman": 0.3000991493231859,
+              "unique_asins": 479
             },
-            "tops": {
-              "ndcg@10": 0.9171807529683248,
-              "ndcg@20": 0.9032666458147167,
-              "row_count": 609,
-              "spearman": 0.20663479111623126,
-              "unique_asins": 609
+            "tops_general": {
+              "ndcg@10": 0.9430505929369629,
+              "ndcg@20": 0.9251894648088743,
+              "row_count": 3107,
+              "spearman": 0.25354242014120154,
+              "unique_asins": 3107
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.9248990552708403,
+              "ndcg@20": 0.9104899468607247,
+              "row_count": 2079,
+              "spearman": 0.2856871983971738,
+              "unique_asins": 2079
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.8918123349488294,
+              "ndcg@20": 0.8851139797700908,
+              "row_count": 1448,
+              "spearman": 0.22980020100188353,
+              "unique_asins": 1448
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 26,
-              "sweater": 164,
-              "t_shirt": 41,
-              "unknown": 378
+              "shirt_top": 1294,
+              "sweater": 1448,
+              "t_shirt": 785,
+              "unknown": 3107
             },
             "fine_subcategory_metric_slices": {
               "shirt_top": {
-                "ndcg@10": 0.8379824821860075,
-                "ndcg@20": 0.8574554096217196,
-                "row_count": 26,
-                "spearman": 0.044583724573328584
+                "ndcg@10": 0.870224349292713,
+                "ndcg@20": 0.900147496918128,
+                "row_count": 1294,
+                "spearman": 0.24680308899841538
               },
               "sweater": {
-                "ndcg@10": 0.7770557365255104,
-                "ndcg@20": 0.8094170816068237,
-                "row_count": 164,
-                "spearman": 0.17632419844827285
+                "ndcg@10": 0.8918123349488294,
+                "ndcg@20": 0.8851139797700908,
+                "row_count": 1448,
+                "spearman": 0.22980020100188353
               },
               "t_shirt": {
-                "ndcg@10": 0.8904249774811296,
-                "ndcg@20": 0.9078881714547955,
-                "row_count": 41,
-                "spearman": 0.18165217360795424
+                "ndcg@10": 0.9408346594237562,
+                "ndcg@20": 0.9052537516638212,
+                "row_count": 785,
+                "spearman": 0.3208951428778857
               },
               "unknown": {
-                "ndcg@10": 0.9245107013431536,
-                "ndcg@20": 0.9171419130352659,
-                "row_count": 378,
-                "spearman": 0.23273581838234056
+                "ndcg@10": 0.9430505929369629,
+                "ndcg@20": 0.9251894648088743,
+                "row_count": 3107,
+                "spearman": 0.25354242014120154
               }
             },
-            "row_count": 609,
+            "row_count": 6634,
             "skipped_metric_slices": {}
           }
         },
         "fit_score": {
           "overall_metrics": {
-            "ndcg@10": 0.8120564045734125,
-            "ndcg@20": 0.8180326903103805,
-            "spearman": 0.13048147864599094
+            "ndcg@10": 0.888096221669289,
+            "ndcg@20": 0.8709057878042217,
+            "spearman": 0.11010258253177313
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.8295085305893287,
-              "ndcg@20": 0.8045882941291328,
-              "row_count": 313,
-              "spearman": 0.08645140077971633,
-              "unique_asins": 313
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.879632719783078,
+              "ndcg@20": 0.821185919005344,
+              "row_count": 1256,
+              "spearman": 0.08292350033074558,
+              "unique_asins": 1256
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.9033546376559326,
+              "ndcg@20": 0.9111127081483975,
+              "row_count": 889,
+              "spearman": 0.12279946434396039,
+              "unique_asins": 889
             },
             "dress": {
-              "ndcg@10": 0.8554627527261275,
-              "ndcg@20": 0.8528081144971397,
-              "row_count": 842,
-              "spearman": 0.15475275627023902,
-              "unique_asins": 842
+              "ndcg@10": 0.8764008140305496,
+              "ndcg@20": 0.8372513238053946,
+              "row_count": 1878,
+              "spearman": 0.07812489373509907,
+              "unique_asins": 1878
             },
             "footwear": {
-              "ndcg@10": 0.832716981876737,
-              "ndcg@20": 0.8342182229656431,
-              "row_count": 193,
-              "spearman": 0.007791856266336427,
-              "unique_asins": 193
+              "ndcg@10": 0.805810771492928,
+              "ndcg@20": 0.8220185341952133,
+              "row_count": 1196,
+              "spearman": 0.05195591459243727,
+              "unique_asins": 1196
             },
             "intimates_sleep": {
-              "ndcg@10": 0.8248774190520131,
-              "ndcg@20": 0.8298405025281644,
-              "row_count": 126,
-              "spearman": 0.28760729611405617,
-              "unique_asins": 126
+              "ndcg@10": 0.8294411075568845,
+              "ndcg@20": 0.8619552389555302,
+              "row_count": 702,
+              "spearman": 0.13665902840305663,
+              "unique_asins": 702
             },
             "outerwear": {
-              "ndcg@10": 0.8740556642493872,
-              "ndcg@20": 0.8605576932310238,
-              "row_count": 79,
-              "spearman": 0.1047641968470237,
-              "unique_asins": 79
+              "ndcg@10": 0.9307187740514419,
+              "ndcg@20": 0.9000808420782838,
+              "row_count": 479,
+              "spearman": 0.13041479854371651,
+              "unique_asins": 479
             },
-            "tops": {
-              "ndcg@10": 0.6557170789468816,
-              "ndcg@20": 0.7261833145111791,
-              "row_count": 609,
-              "spearman": 0.1415213655985741,
-              "unique_asins": 609
+            "tops_general": {
+              "ndcg@10": 0.978516495022769,
+              "ndcg@20": 0.9308853571597521,
+              "row_count": 3107,
+              "spearman": 0.12776252700988017,
+              "unique_asins": 3107
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.875111429982536,
+              "ndcg@20": 0.8377008140156065,
+              "row_count": 2079,
+              "spearman": 0.1689869164786424,
+              "unique_asins": 2079
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.9138792454474819,
+              "ndcg@20": 0.9159613528744732,
+              "row_count": 1448,
+              "spearman": 0.09129619934842015,
+              "unique_asins": 1448
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 26,
-              "sweater": 164,
-              "t_shirt": 41,
-              "unknown": 378
+              "shirt_top": 1294,
+              "sweater": 1448,
+              "t_shirt": 785,
+              "unknown": 3107
             },
             "fine_subcategory_metric_slices": {
               "shirt_top": {
-                "ndcg@10": 0.6557170789468816,
-                "ndcg@20": 0.7735259004222026,
-                "row_count": 26,
-                "spearman": 0.034223510049437744
+                "ndcg@10": 0.875111429982536,
+                "ndcg@20": 0.8377008140156065,
+                "row_count": 1294,
+                "spearman": 0.1306159912399668
               },
               "sweater": {
-                "ndcg@10": 0.8674325081299221,
-                "ndcg@20": 0.8441369278084329,
-                "row_count": 164,
-                "spearman": 0.17460153252828098
+                "ndcg@10": 0.9138792454474819,
+                "ndcg@20": 0.9159613528744732,
+                "row_count": 1448,
+                "spearman": 0.09129619934842015
               },
               "t_shirt": {
-                "ndcg@10": 0.9215370497823228,
-                "ndcg@20": 0.9190074561062977,
-                "row_count": 41,
-                "spearman": 0.22024113517415528
+                "ndcg@10": 0.828751950737936,
+                "ndcg@20": 0.8020449327716592,
+                "row_count": 785,
+                "spearman": 0.20543430096245902
               },
               "unknown": {
-                "ndcg@10": 0.9130845093993749,
-                "ndcg@20": 0.8704169008351474,
-                "row_count": 378,
-                "spearman": 0.11474318248713353
+                "ndcg@10": 0.978516495022769,
+                "ndcg@20": 0.9308853571597521,
+                "row_count": 3107,
+                "spearman": 0.12776252700988017
               }
             },
-            "row_count": 609,
+            "row_count": 6634,
             "skipped_metric_slices": {}
           }
         },
         "mean_rating_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7839063416734869,
-            "ndcg@20": 0.7931525900726166,
-            "spearman": 0.17041662173709923
+            "ndcg@10": 0.8498103613139171,
+            "ndcg@20": 0.850026015969243,
+            "spearman": 0.22974469881113768
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.7980557738033534,
-              "ndcg@20": 0.7898941334587155,
-              "row_count": 313,
-              "spearman": 0.227791138503243,
-              "unique_asins": 313
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.8201375820250604,
+              "ndcg@20": 0.783458996195346,
+              "row_count": 1256,
+              "spearman": 0.297431720378241,
+              "unique_asins": 1256
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.8300286011388864,
+              "ndcg@20": 0.8409078876570047,
+              "row_count": 889,
+              "spearman": 0.17578193606377737,
+              "unique_asins": 889
             },
             "dress": {
-              "ndcg@10": 0.6954813512941995,
-              "ndcg@20": 0.7582713638743628,
-              "row_count": 842,
-              "spearman": 0.16500143380387905,
-              "unique_asins": 842
+              "ndcg@10": 0.7890922763983846,
+              "ndcg@20": 0.7571803564000585,
+              "row_count": 1878,
+              "spearman": 0.1913257321809542,
+              "unique_asins": 1878
             },
             "footwear": {
-              "ndcg@10": 0.714228864279501,
-              "ndcg@20": 0.7620365861412791,
-              "row_count": 193,
-              "spearman": 0.07559728151196064,
-              "unique_asins": 193
+              "ndcg@10": 0.8877448500071599,
+              "ndcg@20": 0.8660708455979306,
+              "row_count": 1196,
+              "spearman": 0.22154924844157656,
+              "unique_asins": 1196
             },
             "intimates_sleep": {
-              "ndcg@10": 0.9202746187003487,
-              "ndcg@20": 0.9013795836668462,
-              "row_count": 126,
-              "spearman": 0.39045042168597727,
-              "unique_asins": 126
+              "ndcg@10": 0.8267811874667247,
+              "ndcg@20": 0.8609910771109927,
+              "row_count": 702,
+              "spearman": 0.25934875470847074,
+              "unique_asins": 702
             },
             "outerwear": {
-              "ndcg@10": 0.7962410062352657,
-              "ndcg@20": 0.7697920025612429,
-              "row_count": 79,
-              "spearman": 0.0208984248824742,
-              "unique_asins": 79
+              "ndcg@10": 0.8793579012022973,
+              "ndcg@20": 0.8673154185147492,
+              "row_count": 479,
+              "spearman": 0.2533697039111747,
+              "unique_asins": 479
             },
-            "tops": {
-              "ndcg@10": 0.7791564357282539,
-              "ndcg@20": 0.7775418707332533,
-              "row_count": 609,
-              "spearman": 0.1427610300350612,
-              "unique_asins": 609
+            "tops_general": {
+              "ndcg@10": 0.9102756990259361,
+              "ndcg@20": 0.9323785831177954,
+              "row_count": 3107,
+              "spearman": 0.23004904225949782,
+              "unique_asins": 3107
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.7722379913120798,
+              "ndcg@20": 0.7927728031485796,
+              "row_count": 2079,
+              "spearman": 0.2390051195896641,
+              "unique_asins": 2079
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.9326371632487244,
+              "ndcg@20": 0.94915817598073,
+              "row_count": 1448,
+              "spearman": 0.1998410317668826,
+              "unique_asins": 1448
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 26,
-              "sweater": 164,
-              "t_shirt": 41,
-              "unknown": 378
+              "shirt_top": 1294,
+              "sweater": 1448,
+              "t_shirt": 785,
+              "unknown": 3107
             },
             "fine_subcategory_metric_slices": {
               "shirt_top": {
-                "ndcg@10": 0.7791564357282539,
-                "ndcg@20": 0.8403739774104748,
-                "row_count": 26,
-                "spearman": 0.06263661250315952
+                "ndcg@10": 0.7722379913120798,
+                "ndcg@20": 0.7927728031485796,
+                "row_count": 1294,
+                "spearman": 0.20824866298947695
               },
               "sweater": {
-                "ndcg@10": 0.8007500330673312,
-                "ndcg@20": 0.8109735437818638,
-                "row_count": 164,
-                "spearman": 0.033166908405352434
+                "ndcg@10": 0.9326371632487244,
+                "ndcg@20": 0.94915817598073,
+                "row_count": 1448,
+                "spearman": 0.1998410317668826
               },
               "t_shirt": {
-                "ndcg@10": 0.8978410011921916,
-                "ndcg@20": 0.9128761688799965,
-                "row_count": 41,
-                "spearman": 0.27458294379392156
+                "ndcg@10": 0.8360028399248108,
+                "ndcg@20": 0.8909798230298699,
+                "row_count": 785,
+                "spearman": 0.2682711131683465
               },
               "unknown": {
-                "ndcg@10": 0.946320273336244,
-                "ndcg@20": 0.9013612753847524,
-                "row_count": 378,
-                "spearman": 0.19623531868199215
+                "ndcg@10": 0.9102756990259361,
+                "ndcg@20": 0.9323785831177954,
+                "row_count": 3107,
+                "spearman": 0.23004904225949782
               }
             },
-            "row_count": 609,
+            "row_count": 6634,
             "skipped_metric_slices": {}
           }
         },
         "random_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7872432095983944,
-            "ndcg@20": 0.7748909392374221,
-            "spearman": -0.04169422625097222
+            "ndcg@10": 0.7977958982980656,
+            "ndcg@20": 0.8073056503833486,
+            "spearman": 0.016662647307729858
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.7719132698051697,
-              "ndcg@20": 0.7208576712930447,
-              "row_count": 313,
-              "spearman": -0.06003765078444283,
-              "unique_asins": 313
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.7138824548523286,
+              "ndcg@20": 0.7473667348818438,
+              "row_count": 1256,
+              "spearman": -0.01470618632765468,
+              "unique_asins": 1256
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.8978464256073027,
+              "ndcg@20": 0.8686347552091581,
+              "row_count": 889,
+              "spearman": -0.005601690806461425,
+              "unique_asins": 889
             },
             "dress": {
-              "ndcg@10": 0.8792004696999041,
-              "ndcg@20": 0.861572991122212,
-              "row_count": 842,
-              "spearman": -0.019867870772510916,
-              "unique_asins": 842
+              "ndcg@10": 0.8603677998885471,
+              "ndcg@20": 0.8332629283870951,
+              "row_count": 1878,
+              "spearman": -0.006992520110511488,
+              "unique_asins": 1878
             },
             "footwear": {
-              "ndcg@10": 0.7710103212011069,
-              "ndcg@20": 0.7847233519159977,
-              "row_count": 193,
-              "spearman": 0.04325271402417632,
-              "unique_asins": 193
+              "ndcg@10": 0.7629410349815561,
+              "ndcg@20": 0.8083872139647923,
+              "row_count": 1196,
+              "spearman": 0.008294474431919602,
+              "unique_asins": 1196
             },
             "intimates_sleep": {
-              "ndcg@10": 0.7314217208585717,
-              "ndcg@20": 0.7327099380173377,
-              "row_count": 126,
-              "spearman": -0.18052080754819147,
-              "unique_asins": 126
+              "ndcg@10": 0.8581729112479346,
+              "ndcg@20": 0.8740686266218507,
+              "row_count": 702,
+              "spearman": 0.06635234175564157,
+              "unique_asins": 702
             },
             "outerwear": {
-              "ndcg@10": 0.7857886183975424,
-              "ndcg@20": 0.7557868371018381,
-              "row_count": 79,
-              "spearman": -0.040718431453736215,
-              "unique_asins": 79
+              "ndcg@10": 0.8160745210180302,
+              "ndcg@20": 0.8360496553750806,
+              "row_count": 479,
+              "spearman": 0.1098888462666405,
+              "unique_asins": 479
             },
-            "tops": {
-              "ndcg@10": 0.7841248576280725,
-              "ndcg@20": 0.793694845974103,
-              "row_count": 609,
-              "spearman": 0.007726689028871752,
-              "unique_asins": 609
+            "tops_general": {
+              "ndcg@10": 0.7976270336689352,
+              "ndcg@20": 0.7707305500916107,
+              "row_count": 3107,
+              "spearman": 0.007211268514787553,
+              "unique_asins": 3107
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.6578245471737953,
+              "ndcg@20": 0.718084102845482,
+              "row_count": 2079,
+              "spearman": 0.022911245902631206,
+              "unique_asins": 2079
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.8154263562441609,
+              "ndcg@20": 0.8091662860732237,
+              "row_count": 1448,
+              "spearman": -0.03739395385742412,
+              "unique_asins": 1448
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 26,
-              "sweater": 164,
-              "t_shirt": 41,
-              "unknown": 378
+              "shirt_top": 1294,
+              "sweater": 1448,
+              "t_shirt": 785,
+              "unknown": 3107
             },
             "fine_subcategory_metric_slices": {
               "shirt_top": {
-                "ndcg@10": 0.8170116450571896,
-                "ndcg@20": 0.8369008513641666,
-                "row_count": 26,
-                "spearman": -0.280254762571035
+                "ndcg@10": 0.6299758172106061,
+                "ndcg@20": 0.7096567798828463,
+                "row_count": 1294,
+                "spearman": 0.024273181164501376
               },
               "sweater": {
-                "ndcg@10": 0.5893144114947819,
-                "ndcg@20": 0.6754701428603908,
-                "row_count": 164,
-                "spearman": -0.11541865774626914
+                "ndcg@10": 0.8154263562441609,
+                "ndcg@20": 0.8091662860732237,
+                "row_count": 1448,
+                "spearman": -0.03739395385742412
               },
               "t_shirt": {
-                "ndcg@10": 0.9277799124358928,
-                "ndcg@20": 0.9070015238089618,
-                "row_count": 41,
-                "spearman": 0.1019607625900909
+                "ndcg@10": 0.8915493624360574,
+                "ndcg@20": 0.8527758444622553,
+                "row_count": 785,
+                "spearman": 0.020077974181925348
               },
               "unknown": {
-                "ndcg@10": 0.8217982637099815,
-                "ndcg@20": 0.8107121078321419,
-                "row_count": 378,
-                "spearman": 0.06274393596892097
+                "ndcg@10": 0.7976270336689352,
+                "ndcg@20": 0.7707305500916107,
+                "row_count": 3107,
+                "spearman": 0.007211268514787553
               }
             },
-            "row_count": 609,
+            "row_count": 6634,
             "skipped_metric_slices": {}
           }
         },
         "review_volume_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7936940976872208,
-            "ndcg@20": 0.7787341338137149,
-            "spearman": 0.0649129711729073
+            "ndcg@10": 0.8047201292238364,
+            "ndcg@20": 0.8162873372297554,
+            "spearman": 0.03932930792677482
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.8047343231140126,
-              "ndcg@20": 0.756495241678968,
-              "row_count": 313,
-              "spearman": 0.0825931436766928,
-              "unique_asins": 313
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.8388622063612445,
+              "ndcg@20": 0.8390078063111057,
+              "row_count": 1256,
+              "spearman": 0.08125074349888514,
+              "unique_asins": 1256
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.7789621933180255,
+              "ndcg@20": 0.7749224381022479,
+              "row_count": 889,
+              "spearman": 0.04468175910914506,
+              "unique_asins": 889
             },
             "dress": {
-              "ndcg@10": 0.7821212308805019,
-              "ndcg@20": 0.7830239193803127,
-              "row_count": 842,
-              "spearman": 0.0387569524942946,
-              "unique_asins": 842
+              "ndcg@10": 0.7429660883256323,
+              "ndcg@20": 0.7790982491198802,
+              "row_count": 1878,
+              "spearman": 0.006225472023639973,
+              "unique_asins": 1878
             },
             "footwear": {
-              "ndcg@10": 0.8046367685801012,
-              "ndcg@20": 0.8187212224776654,
-              "row_count": 193,
-              "spearman": 0.0856232491043142,
-              "unique_asins": 193
+              "ndcg@10": 0.840173794722025,
+              "ndcg@20": 0.8461253914335993,
+              "row_count": 1196,
+              "spearman": 0.056762654614351656,
+              "unique_asins": 1196
             },
             "intimates_sleep": {
-              "ndcg@10": 0.7078436559631197,
-              "ndcg@20": 0.6974207904404266,
-              "row_count": 126,
-              "spearman": -0.1019967481942746,
-              "unique_asins": 126
+              "ndcg@10": 0.8397477744387508,
+              "ndcg@20": 0.8311608174509584,
+              "row_count": 702,
+              "spearman": -0.036961309725339495,
+              "unique_asins": 702
             },
             "outerwear": {
-              "ndcg@10": 0.9025995968378848,
-              "ndcg@20": 0.8471787309923469,
-              "row_count": 79,
-              "spearman": 0.25083213637806,
-              "unique_asins": 79
+              "ndcg@10": 0.8734731775495088,
+              "ndcg@20": 0.87307238903804,
+              "row_count": 479,
+              "spearman": 0.07894796076931937,
+              "unique_asins": 479
             },
-            "tops": {
-              "ndcg@10": 0.7602290107477045,
-              "ndcg@20": 0.7695648979125702,
-              "row_count": 609,
-              "spearman": 0.03366909357835675,
-              "unique_asins": 609
+            "tops_general": {
+              "ndcg@10": 0.7508721341152952,
+              "ndcg@20": 0.803291028248653,
+              "row_count": 3107,
+              "spearman": 0.005875765918275544,
+              "unique_asins": 3107
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.7295968467395534,
+              "ndcg@20": 0.7405181694049847,
+              "row_count": 2079,
+              "spearman": 0.036550586895823696,
+              "unique_asins": 2079
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.8478269474444922,
+              "ndcg@20": 0.8593897459583298,
+              "row_count": 1448,
+              "spearman": 0.08063013823687239,
+              "unique_asins": 1448
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 26,
-              "sweater": 164,
-              "t_shirt": 41,
-              "unknown": 378
+              "shirt_top": 1294,
+              "sweater": 1448,
+              "t_shirt": 785,
+              "unknown": 3107
             },
             "fine_subcategory_metric_slices": {
               "shirt_top": {
-                "ndcg@10": 0.84975831484597,
-                "ndcg@20": 0.8564297149885035,
-                "row_count": 26,
-                "spearman": 0.012869313243852194
+                "ndcg@10": 0.7295968467395534,
+                "ndcg@20": 0.7405181694049847,
+                "row_count": 1294,
+                "spearman": 0.06476521896875827
               },
               "sweater": {
-                "ndcg@10": 0.890277407271737,
-                "ndcg@20": 0.8416830012741421,
-                "row_count": 164,
-                "spearman": 0.10672978020223481
+                "ndcg@10": 0.8478269474444922,
+                "ndcg@20": 0.8593897459583298,
+                "row_count": 1448,
+                "spearman": 0.08063013823687239
               },
               "t_shirt": {
-                "ndcg@10": 0.8890236956481804,
-                "ndcg@20": 0.8560450615657971,
-                "row_count": 41,
-                "spearman": -0.29185898724358295
+                "ndcg@10": 0.9197741626484559,
+                "ndcg@20": 0.8839233348150892,
+                "row_count": 785,
+                "spearman": 0.01566288900565742
               },
               "unknown": {
-                "ndcg@10": 0.7487828267176636,
-                "ndcg@20": 0.7510669045040412,
-                "row_count": 378,
-                "spearman": 0.03907357871198228
+                "ndcg@10": 0.7508721341152952,
+                "ndcg@20": 0.803291028248653,
+                "row_count": 3107,
+                "spearman": 0.005875765918275544
               }
             },
-            "row_count": 609,
+            "row_count": 6634,
             "skipped_metric_slices": {}
           }
         }
       },
-      "ranking_group_counts": {
-        "bottoms": 313,
-        "dress": 842,
-        "footwear": 193,
-        "intimates_sleep": 126,
-        "outerwear": 79,
-        "tops": 609
+      "query_group_counts": {
+        "bottoms_other": 1256,
+        "bottoms_pants": 889,
+        "dress": 1878,
+        "footwear": 1196,
+        "intimates_sleep": 702,
+        "outerwear": 479,
+        "tops_general": 3107,
+        "tops_shirts": 2079,
+        "tops_sweater": 1448
       },
-      "row_count": 2162,
+      "ranking_group_counts": {
+        "bottoms": 2145,
+        "dress": 1878,
+        "footwear": 1196,
+        "intimates_sleep": 702,
+        "outerwear": 479,
+        "tops": 6634
+      },
+      "row_count": 13034,
       "subcategory_counts": {
-        "dress": 833,
-        "jacket": 77,
-        "pants": 239,
-        "shirt_top": 26,
-        "shoes": 193,
-        "skirt": 55,
-        "sweater": 164,
-        "t_shirt": 41,
-        "underwear_sleepwear": 126,
-        "unknown": 408
+        "dress": 1467,
+        "jacket": 275,
+        "pants": 889,
+        "shirt_top": 1294,
+        "shoes": 978,
+        "skirt": 254,
+        "sweater": 1448,
+        "t_shirt": 785,
+        "underwear_sleepwear": 668,
+        "unknown": 4976
       }
     },
     "validation": {
       "baselines": {
         "blended_score": {
           "overall_metrics": {
-            "ndcg@10": 0.8817135686258911,
-            "ndcg@20": 0.8562688129606624,
-            "spearman": 0.18017028020934664
+            "ndcg@10": 0.8749886119939408,
+            "ndcg@20": 0.8802800536346679,
+            "spearman": 0.23141896991204192
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.8739062705731321,
-              "ndcg@20": 0.8796844262252057,
-              "row_count": 281,
-              "spearman": 0.14307924751979184,
-              "unique_asins": 281
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.9275458888215329,
+              "ndcg@20": 0.9301338697483102,
+              "row_count": 883,
+              "spearman": 0.26121702830815746,
+              "unique_asins": 883
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.7458802786629433,
+              "ndcg@20": 0.7502298122514579,
+              "row_count": 1021,
+              "spearman": 0.14045302303799603,
+              "unique_asins": 1021
             },
             "dress": {
-              "ndcg@10": 0.9206131966725364,
-              "ndcg@20": 0.8701095281498303,
-              "row_count": 384,
-              "spearman": 0.19680654874522863,
-              "unique_asins": 384
+              "ndcg@10": 0.9108727100911077,
+              "ndcg@20": 0.9045012855650418,
+              "row_count": 893,
+              "spearman": 0.19233931722968498,
+              "unique_asins": 893
             },
             "footwear": {
-              "ndcg@10": 0.9354901172162977,
-              "ndcg@20": 0.8439544066354722,
-              "row_count": 113,
-              "spearman": 0.23110614329194645,
-              "unique_asins": 113
+              "ndcg@10": 0.9330461401146775,
+              "ndcg@20": 0.9108942765176679,
+              "row_count": 849,
+              "spearman": 0.27772889723409433,
+              "unique_asins": 849
             },
             "intimates_sleep": {
-              "ndcg@10": 0.8339835640818145,
-              "ndcg@20": 0.8527381464630255,
-              "row_count": 93,
-              "spearman": 0.28670119182727044,
-              "unique_asins": 93
+              "ndcg@10": 0.8603483668584998,
+              "ndcg@20": 0.8508470759183789,
+              "row_count": 394,
+              "spearman": 0.18406142380263105,
+              "unique_asins": 394
             },
             "outerwear": {
-              "ndcg@10": 0.8783276916223074,
-              "ndcg@20": 0.8451575456180958,
-              "row_count": 93,
-              "spearman": 0.01759573890537391,
-              "unique_asins": 93
+              "ndcg@10": 0.9182510084488275,
+              "ndcg@20": 0.9164538841531075,
+              "row_count": 332,
+              "spearman": 0.32582871049901707,
+              "unique_asins": 332
             },
-            "tops": {
-              "ndcg@10": 0.8479605715892586,
-              "ndcg@20": 0.8459688246723445,
-              "row_count": 536,
-              "spearman": 0.2057328109664685,
-              "unique_asins": 536
+            "tops_general": {
+              "ndcg@10": 0.8674828481743391,
+              "ndcg@20": 0.9112727589275146,
+              "row_count": 2250,
+              "spearman": 0.25582179952983936,
+              "unique_asins": 2250
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.9149741612512534,
+              "ndcg@20": 0.9143258396402448,
+              "row_count": 1685,
+              "spearman": 0.19615491733130447,
+              "unique_asins": 1685
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.7964961055222866,
+              "ndcg@20": 0.8338616799902876,
+              "row_count": 1229,
+              "spearman": 0.24916561223565262,
+              "unique_asins": 1229
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 18,
-              "sweater": 98,
-              "t_shirt": 32,
-              "unknown": 388
+              "shirt_top": 923,
+              "sweater": 1229,
+              "t_shirt": 762,
+              "unknown": 2250
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.8901345859256261,
+                "ndcg@20": 0.878357679539672,
+                "row_count": 923,
+                "spearman": 0.18375502843212688
+              },
               "sweater": {
-                "ndcg@10": 0.8535896250461819,
-                "ndcg@20": 0.8349458655765043,
-                "row_count": 98,
-                "spearman": 0.40647871929758905
+                "ndcg@10": 0.7964961055222866,
+                "ndcg@20": 0.8338616799902876,
+                "row_count": 1229,
+                "spearman": 0.24916561223565262
               },
               "t_shirt": {
-                "ndcg@10": 0.8164078673583159,
-                "ndcg@20": 0.8731067669942719,
-                "row_count": 32,
-                "spearman": 0.23145168106791492
+                "ndcg@10": 0.9131685448242145,
+                "ndcg@20": 0.8932871893166875,
+                "row_count": 762,
+                "spearman": 0.20957781913422358
               },
               "unknown": {
-                "ndcg@10": 0.8479605715892586,
-                "ndcg@20": 0.8655354398175241,
-                "row_count": 388,
-                "spearman": 0.16085041193678992
+                "ndcg@10": 0.8674828481743391,
+                "ndcg@20": 0.9112727589275146,
+                "row_count": 2250,
+                "spearman": 0.25582179952983936
               }
             },
-            "row_count": 536,
-            "skipped_metric_slices": {
-              "shirt_top": 18
-            }
+            "row_count": 5164,
+            "skipped_metric_slices": {}
           }
         },
         "fit_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7855508358303673,
-            "ndcg@20": 0.7758595722539693,
-            "spearman": 0.10563908100455925
+            "ndcg@10": 0.8237044218779835,
+            "ndcg@20": 0.8337230615395715,
+            "spearman": 0.08795439133401096
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.7425768746898852,
-              "ndcg@20": 0.6888482141827273,
-              "row_count": 281,
-              "spearman": 0.050983568252965294,
-              "unique_asins": 281
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.727000095372954,
+              "ndcg@20": 0.7619076229041383,
+              "row_count": 883,
+              "spearman": 0.15904402054926017,
+              "unique_asins": 883
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.7718856130444358,
+              "ndcg@20": 0.7643467943242243,
+              "row_count": 1021,
+              "spearman": 0.055275517880316864,
+              "unique_asins": 1021
             },
             "dress": {
-              "ndcg@10": 0.7850137179965949,
-              "ndcg@20": 0.831394172237732,
-              "row_count": 384,
-              "spearman": 0.07766072608531153,
-              "unique_asins": 384
+              "ndcg@10": 0.8239176336992118,
+              "ndcg@20": 0.8570308077987786,
+              "row_count": 893,
+              "spearman": 0.04082883603810431,
+              "unique_asins": 893
             },
             "footwear": {
-              "ndcg@10": 0.9033296868120652,
-              "ndcg@20": 0.8635581737080477,
-              "row_count": 113,
-              "spearman": 0.24099118658994348,
-              "unique_asins": 113
+              "ndcg@10": 0.908507539726505,
+              "ndcg@20": 0.8504520401695239,
+              "row_count": 849,
+              "spearman": 0.10631348600475755,
+              "unique_asins": 849
             },
             "intimates_sleep": {
-              "ndcg@10": 0.8412920512688217,
-              "ndcg@20": 0.7762975401714123,
-              "row_count": 93,
-              "spearman": 0.08226691189779503,
-              "unique_asins": 93
+              "ndcg@10": 0.7563650998736324,
+              "ndcg@20": 0.8000396549594961,
+              "row_count": 394,
+              "spearman": 0.06460337852136239,
+              "unique_asins": 394
             },
             "outerwear": {
-              "ndcg@10": 0.8451870153007924,
-              "ndcg@20": 0.835630305030567,
-              "row_count": 93,
-              "spearman": 0.13379873520397162,
-              "unique_asins": 93
+              "ndcg@10": 0.8787560805148605,
+              "ndcg@20": 0.8594133917754617,
+              "row_count": 332,
+              "spearman": 0.1303121452330004,
+              "unique_asins": 332
             },
-            "tops": {
-              "ndcg@10": 0.5959056689140442,
-              "ndcg@20": 0.6594290281933295,
-              "row_count": 536,
-              "spearman": 0.04813335799736855,
-              "unique_asins": 536
+            "tops_general": {
+              "ndcg@10": 0.9017379232027437,
+              "ndcg@20": 0.9141877179737394,
+              "row_count": 2250,
+              "spearman": 0.11151287571509225,
+              "unique_asins": 2250
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.6708154735454152,
+              "ndcg@20": 0.7508552278932312,
+              "row_count": 1685,
+              "spearman": 0.07084756735370178,
+              "unique_asins": 1685
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.9743543379220929,
+              "ndcg@20": 0.9452742960575502,
+              "row_count": 1229,
+              "spearman": 0.05285169471050294,
+              "unique_asins": 1229
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 18,
-              "sweater": 98,
-              "t_shirt": 32,
-              "unknown": 388
+              "shirt_top": 923,
+              "sweater": 1229,
+              "t_shirt": 762,
+              "unknown": 2250
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.6708154735454152,
+                "ndcg@20": 0.7508552278932312,
+                "row_count": 923,
+                "spearman": 0.07175894014042611
+              },
               "sweater": {
-                "ndcg@10": 0.7908258760325736,
-                "ndcg@20": 0.7863262138659214,
-                "row_count": 98,
-                "spearman": 0.15405799805878925
+                "ndcg@10": 0.9743543379220929,
+                "ndcg@20": 0.9452742960575502,
+                "row_count": 1229,
+                "spearman": 0.05285169471050294
               },
               "t_shirt": {
-                "ndcg@10": 0.7919696590276251,
-                "ndcg@20": 0.8321255077197942,
-                "row_count": 32,
-                "spearman": 0.04304130284467816
+                "ndcg@10": 0.7349471305385521,
+                "ndcg@20": 0.7886034191319916,
+                "row_count": 762,
+                "spearman": 0.06350507496566156
               },
               "unknown": {
-                "ndcg@10": 0.7555013543403074,
-                "ndcg@20": 0.7728647386521489,
-                "row_count": 388,
-                "spearman": 0.041493719831340675
+                "ndcg@10": 0.9017379232027437,
+                "ndcg@20": 0.9141877179737394,
+                "row_count": 2250,
+                "spearman": 0.11151287571509225
               }
             },
-            "row_count": 536,
-            "skipped_metric_slices": {
-              "shirt_top": 18
-            }
+            "row_count": 5164,
+            "skipped_metric_slices": {}
           }
         },
         "mean_rating_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7843246431316854,
-            "ndcg@20": 0.7815799432907937,
-            "spearman": 0.14441128332411482
+            "ndcg@10": 0.8458790747873329,
+            "ndcg@20": 0.8387448654235171,
+            "spearman": 0.21540609744508432
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.8632513062393183,
-              "ndcg@20": 0.8491876142869924,
-              "row_count": 281,
-              "spearman": 0.12553398919665676,
-              "unique_asins": 281
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.7836411659358048,
+              "ndcg@20": 0.793150865535914,
+              "row_count": 883,
+              "spearman": 0.22785259155911056,
+              "unique_asins": 883
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.8805072050487783,
+              "ndcg@20": 0.8500461137005576,
+              "row_count": 1021,
+              "spearman": 0.14988663487202494,
+              "unique_asins": 1021
             },
             "dress": {
-              "ndcg@10": 0.7938894669279961,
-              "ndcg@20": 0.7867882852017756,
-              "row_count": 384,
-              "spearman": 0.11611860882033068,
-              "unique_asins": 384
+              "ndcg@10": 0.7157234561318819,
+              "ndcg@20": 0.7764921769497775,
+              "row_count": 893,
+              "spearman": 0.21126872396466484,
+              "unique_asins": 893
             },
             "footwear": {
-              "ndcg@10": 0.8226240009208943,
-              "ndcg@20": 0.7831652558454077,
-              "row_count": 113,
-              "spearman": 0.18186672372547694,
-              "unique_asins": 113
+              "ndcg@10": 0.8009953213895169,
+              "ndcg@20": 0.8277814935332387,
+              "row_count": 849,
+              "spearman": 0.2415808107338907,
+              "unique_asins": 849
             },
             "intimates_sleep": {
-              "ndcg@10": 0.8418692807719784,
-              "ndcg@20": 0.862392224747484,
-              "row_count": 93,
-              "spearman": 0.2849045962938686,
-              "unique_asins": 93
+              "ndcg@10": 0.8825901123961413,
+              "ndcg@20": 0.8592730907577062,
+              "row_count": 394,
+              "spearman": 0.2065702932663905,
+              "unique_asins": 394
             },
             "outerwear": {
-              "ndcg@10": 0.8577098894968131,
-              "ndcg@20": 0.8041437904595292,
-              "row_count": 93,
-              "spearman": -0.010784641867462683,
-              "unique_asins": 93
+              "ndcg@10": 0.9361034493220239,
+              "ndcg@20": 0.8856949241322123,
+              "row_count": 332,
+              "spearman": 0.2968579815718705,
+              "unique_asins": 332
             },
-            "tops": {
-              "ndcg@10": 0.5266039144331119,
-              "ndcg@20": 0.6038024892035737,
-              "row_count": 536,
-              "spearman": 0.16882842377581853,
-              "unique_asins": 536
+            "tops_general": {
+              "ndcg@10": 0.9102971693430995,
+              "ndcg@20": 0.9163129192577318,
+              "row_count": 2250,
+              "spearman": 0.22855878345205313,
+              "unique_asins": 2250
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.8196011249352503,
+              "ndcg@20": 0.7939399217050817,
+              "row_count": 1685,
+              "spearman": 0.17625963767234767,
+              "unique_asins": 1685
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.8834526685834992,
+              "ndcg@20": 0.8460122832394339,
+              "row_count": 1229,
+              "spearman": 0.19981941991340615,
+              "unique_asins": 1229
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 18,
-              "sweater": 98,
-              "t_shirt": 32,
-              "unknown": 388
+              "shirt_top": 923,
+              "sweater": 1229,
+              "t_shirt": 762,
+              "unknown": 2250
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.8196011249352503,
+                "ndcg@20": 0.7939399217050817,
+                "row_count": 923,
+                "spearman": 0.16117920194578375
+              },
               "sweater": {
-                "ndcg@10": 0.7558710951564533,
-                "ndcg@20": 0.7618533512322572,
-                "row_count": 98,
-                "spearman": 0.3155444063682929
+                "ndcg@10": 0.8834526685834992,
+                "ndcg@20": 0.8460122832394339,
+                "row_count": 1229,
+                "spearman": 0.19981941991340615
               },
               "t_shirt": {
-                "ndcg@10": 0.8151010087708461,
-                "ndcg@20": 0.8501765481778543,
-                "row_count": 32,
-                "spearman": 0.2060213140919318
+                "ndcg@10": 0.9679601061140171,
+                "ndcg@20": 0.9331290807262032,
+                "row_count": 762,
+                "spearman": 0.1899227204524174
               },
               "unknown": {
-                "ndcg@10": 0.8859528599529919,
-                "ndcg@20": 0.8939937589838204,
-                "row_count": 388,
-                "spearman": 0.13838500294660602
+                "ndcg@10": 0.9102971693430995,
+                "ndcg@20": 0.9163129192577318,
+                "row_count": 2250,
+                "spearman": 0.22855878345205313
               }
             },
-            "row_count": 536,
-            "skipped_metric_slices": {
-              "shirt_top": 18
-            }
+            "row_count": 5164,
+            "skipped_metric_slices": {}
           }
         },
         "random_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7647336478777494,
-            "ndcg@20": 0.7797746881110724,
-            "spearman": 0.013398081153034895
+            "ndcg@10": 0.7971404145579677,
+            "ndcg@20": 0.7804177859835675,
+            "spearman": -0.006599637722335256
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.683244297716186,
-              "ndcg@20": 0.7086550658174684,
-              "row_count": 281,
-              "spearman": -0.06831102166312825,
-              "unique_asins": 281
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.72270339739989,
+              "ndcg@20": 0.7194960188860264,
+              "row_count": 883,
+              "spearman": -0.03534066996147522,
+              "unique_asins": 883
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.7775153972887483,
+              "ndcg@20": 0.8066405571412497,
+              "row_count": 1021,
+              "spearman": -0.0031106669419840144,
+              "unique_asins": 1021
             },
             "dress": {
-              "ndcg@10": 0.8088150051794643,
-              "ndcg@20": 0.8280078360072933,
-              "row_count": 384,
-              "spearman": 0.017396085118318663,
-              "unique_asins": 384
+              "ndcg@10": 0.8993705635073085,
+              "ndcg@20": 0.8291390369415014,
+              "row_count": 893,
+              "spearman": 0.026021389857009095,
+              "unique_asins": 893
             },
             "footwear": {
-              "ndcg@10": 0.8867925798939041,
-              "ndcg@20": 0.8587125064534822,
-              "row_count": 113,
-              "spearman": 0.22497842546022723,
-              "unique_asins": 113
+              "ndcg@10": 0.8175691564996242,
+              "ndcg@20": 0.7683711631054417,
+              "row_count": 849,
+              "spearman": 0.015519922813810651,
+              "unique_asins": 849
             },
             "intimates_sleep": {
-              "ndcg@10": 0.6443170413620142,
-              "ndcg@20": 0.679867083954656,
-              "row_count": 93,
-              "spearman": -0.1163840098812843,
-              "unique_asins": 93
+              "ndcg@10": 0.8712018570998996,
+              "ndcg@20": 0.8187125912238242,
+              "row_count": 394,
+              "spearman": -0.10384162536459045,
+              "unique_asins": 394
             },
             "outerwear": {
-              "ndcg@10": 0.7743883471667079,
-              "ndcg@20": 0.8133954411655887,
-              "row_count": 93,
-              "spearman": -0.01587765462742477,
-              "unique_asins": 93
+              "ndcg@10": 0.7774563122058862,
+              "ndcg@20": 0.7628914390001691,
+              "row_count": 332,
+              "spearman": 0.06443085295214679,
+              "unique_asins": 332
             },
-            "tops": {
-              "ndcg@10": 0.7908446159482205,
-              "ndcg@20": 0.7900101952679458,
-              "row_count": 536,
-              "spearman": 0.038586662511500794,
-              "unique_asins": 536
+            "tops_general": {
+              "ndcg@10": 0.7678217469623568,
+              "ndcg@20": 0.7551915831806197,
+              "row_count": 2250,
+              "spearman": -0.00869827778574929,
+              "unique_asins": 2250
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.7752578148230961,
+              "ndcg@20": 0.7990438271289697,
+              "row_count": 1685,
+              "spearman": -0.012150744189765,
+              "unique_asins": 1685
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.7653674852349,
+              "ndcg@20": 0.7642738572443047,
+              "row_count": 1229,
+              "spearman": -0.0022269208804198675,
+              "unique_asins": 1229
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 18,
-              "sweater": 98,
-              "t_shirt": 32,
-              "unknown": 388
+              "shirt_top": 923,
+              "sweater": 1229,
+              "t_shirt": 762,
+              "unknown": 2250
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.704655235048129,
+                "ndcg@20": 0.7424535935241631,
+                "row_count": 923,
+                "spearman": -0.027012697589468292
+              },
               "sweater": {
-                "ndcg@10": 0.8225946774052937,
-                "ndcg@20": 0.7716295722080927,
-                "row_count": 98,
-                "spearman": 0.18021962113740886
+                "ndcg@10": 0.7653674852349,
+                "ndcg@20": 0.7642738572443047,
+                "row_count": 1229,
+                "spearman": -0.0022269208804198675
               },
               "t_shirt": {
-                "ndcg@10": 0.7057435509522267,
-                "ndcg@20": 0.7500977250143152,
-                "row_count": 32,
-                "spearman": -0.05662228626883308
+                "ndcg@10": 0.880771428288564,
+                "ndcg@20": 0.8196065546797876,
+                "row_count": 762,
+                "spearman": 0.006226324854880682
               },
               "unknown": {
-                "ndcg@10": 0.8374783621155298,
-                "ndcg@20": 0.8098122764929503,
-                "row_count": 388,
-                "spearman": 0.007644951910395062
+                "ndcg@10": 0.7678217469623568,
+                "ndcg@20": 0.7551915831806197,
+                "row_count": 2250,
+                "spearman": -0.00869827778574929
               }
             },
-            "row_count": 536,
-            "skipped_metric_slices": {
-              "shirt_top": 18
-            }
+            "row_count": 5164,
+            "skipped_metric_slices": {}
           }
         },
         "review_volume_score": {
           "overall_metrics": {
-            "ndcg@10": 0.7877268144034538,
-            "ndcg@20": 0.7742252344637692,
-            "spearman": -0.02174946819999941
+            "ndcg@10": 0.8038303550641168,
+            "ndcg@20": 0.8155909624193597,
+            "spearman": 0.03974713418683748
           },
-          "per_ranking_group_metrics": {
-            "bottoms": {
-              "ndcg@10": 0.8283513753207856,
-              "ndcg@20": 0.7752720674790285,
-              "row_count": 281,
-              "spearman": -0.010507825297273902,
-              "unique_asins": 281
+          "per_query_group_metrics": {
+            "bottoms_other": {
+              "ndcg@10": 0.8140021914065487,
+              "ndcg@20": 0.842441135843323,
+              "row_count": 883,
+              "spearman": 0.022167682926753425,
+              "unique_asins": 883
+            },
+            "bottoms_pants": {
+              "ndcg@10": 0.784465426300978,
+              "ndcg@20": 0.8141388964915365,
+              "row_count": 1021,
+              "spearman": 0.013743106529981322,
+              "unique_asins": 1021
             },
             "dress": {
-              "ndcg@10": 0.8491043251725475,
-              "ndcg@20": 0.8424448686881549,
-              "row_count": 384,
-              "spearman": 0.08590029614603717,
-              "unique_asins": 384
+              "ndcg@10": 0.8175919066353535,
+              "ndcg@20": 0.7958165635204734,
+              "row_count": 893,
+              "spearman": -0.02039314645034888,
+              "unique_asins": 893
             },
             "footwear": {
-              "ndcg@10": 0.780111774111197,
-              "ndcg@20": 0.7462994530541036,
-              "row_count": 113,
-              "spearman": -0.0824631824323549,
-              "unique_asins": 113
+              "ndcg@10": 0.8197145484787433,
+              "ndcg@20": 0.8092645107253984,
+              "row_count": 849,
+              "spearman": 0.03743810781979268,
+              "unique_asins": 849
             },
             "intimates_sleep": {
-              "ndcg@10": 0.6685715603729684,
-              "ndcg@20": 0.7032697772849915,
-              "row_count": 93,
-              "spearman": -0.07528112435771359,
-              "unique_asins": 93
+              "ndcg@10": 0.7014810197683743,
+              "ndcg@20": 0.7647423895178409,
+              "row_count": 394,
+              "spearman": -0.0005743379159795636,
+              "unique_asins": 394
             },
             "outerwear": {
-              "ndcg@10": 0.7654119043831235,
-              "ndcg@20": 0.7538246113030566,
-              "row_count": 93,
-              "spearman": -0.1282079264324639,
-              "unique_asins": 93
+              "ndcg@10": 0.8657930115221564,
+              "ndcg@20": 0.8595060103945703,
+              "row_count": 332,
+              "spearman": 0.06216911550847005,
+              "unique_asins": 332
             },
-            "tops": {
-              "ndcg@10": 0.8348099470601014,
-              "ndcg@20": 0.8242406289732799,
-              "row_count": 536,
-              "spearman": 0.08006295317377267,
-              "unique_asins": 536
+            "tops_general": {
+              "ndcg@10": 0.846875540104236,
+              "ndcg@20": 0.8374393057747065,
+              "row_count": 2250,
+              "spearman": 0.04366696407377973,
+              "unique_asins": 2250
+            },
+            "tops_shirts": {
+              "ndcg@10": 0.749202205964517,
+              "ndcg@20": 0.7614010026236466,
+              "row_count": 1685,
+              "spearman": 0.07577678778930545,
+              "unique_asins": 1685
+            },
+            "tops_sweater": {
+              "ndcg@10": 0.8353473453961441,
+              "ndcg@20": 0.8555688468827419,
+              "row_count": 1229,
+              "spearman": 0.12372992739978306,
+              "unique_asins": 1229
             }
           },
           "tops_diagnostics": {
             "fine_subcategory_counts": {
-              "shirt_top": 18,
-              "sweater": 98,
-              "t_shirt": 32,
-              "unknown": 388
+              "shirt_top": 923,
+              "sweater": 1229,
+              "t_shirt": 762,
+              "unknown": 2250
             },
             "fine_subcategory_metric_slices": {
+              "shirt_top": {
+                "ndcg@10": 0.749202205964517,
+                "ndcg@20": 0.7614010026236466,
+                "row_count": 923,
+                "spearman": 0.10777324422217958
+              },
               "sweater": {
-                "ndcg@10": 0.8790947071740364,
-                "ndcg@20": 0.8506321365620323,
-                "row_count": 98,
-                "spearman": 0.11754614433041502
+                "ndcg@10": 0.8353473453961441,
+                "ndcg@20": 0.8555688468827419,
+                "row_count": 1229,
+                "spearman": 0.12372992739978306
               },
               "t_shirt": {
-                "ndcg@10": 0.786792469551164,
-                "ndcg@20": 0.8273690911642848,
-                "row_count": 32,
-                "spearman": 0.07843331419154866
+                "ndcg@10": 0.9018596930828141,
+                "ndcg@20": 0.8651710122283913,
+                "row_count": 762,
+                "spearman": 0.041371506428736486
               },
               "unknown": {
-                "ndcg@10": 0.8348099470601014,
-                "ndcg@20": 0.8135879155388994,
-                "row_count": 388,
-                "spearman": 0.04993792588144705
+                "ndcg@10": 0.846875540104236,
+                "ndcg@20": 0.8374393057747065,
+                "row_count": 2250,
+                "spearman": 0.04366696407377973
               }
             },
-            "row_count": 536,
-            "skipped_metric_slices": {
-              "shirt_top": 18
-            }
+            "row_count": 5164,
+            "skipped_metric_slices": {}
           }
         }
       },
-      "ranking_group_counts": {
-        "bottoms": 281,
-        "dress": 384,
-        "footwear": 113,
-        "intimates_sleep": 93,
-        "outerwear": 93,
-        "tops": 536
+      "query_group_counts": {
+        "bottoms_other": 883,
+        "bottoms_pants": 1021,
+        "dress": 893,
+        "footwear": 849,
+        "intimates_sleep": 394,
+        "outerwear": 332,
+        "tops_general": 2250,
+        "tops_shirts": 1685,
+        "tops_sweater": 1229
       },
-      "row_count": 1500,
+      "ranking_group_counts": {
+        "bottoms": 1904,
+        "dress": 893,
+        "footwear": 849,
+        "intimates_sleep": 394,
+        "outerwear": 332,
+        "tops": 5164
+      },
+      "row_count": 9536,
       "subcategory_counts": {
-        "dress": 380,
-        "jacket": 92,
-        "pants": 229,
-        "shirt_top": 18,
-        "shoes": 113,
-        "skirt": 22,
-        "sweater": 98,
-        "t_shirt": 32,
-        "underwear_sleepwear": 93,
-        "unknown": 423
+        "dress": 588,
+        "jacket": 198,
+        "pants": 1021,
+        "shirt_top": 923,
+        "shoes": 618,
+        "skirt": 137,
+        "sweater": 1229,
+        "t_shirt": 762,
+        "underwear_sleepwear": 364,
+        "unknown": 3696
       }
     }
   },
@@ -1365,271 +1764,271 @@
     {
       "baseline": "random_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7872432095983944,
+      "overall_score": 0.7977958982980656,
       "split": "train"
     },
     {
       "baseline": "random_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7748909392374221,
+      "overall_score": 0.8073056503833486,
       "split": "train"
     },
     {
       "baseline": "random_score",
       "metric": "spearman",
-      "overall_score": -0.04169422625097222,
+      "overall_score": 0.016662647307729858,
       "split": "train"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7839063416734869,
+      "overall_score": 0.8498103613139171,
       "split": "train"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7931525900726166,
+      "overall_score": 0.850026015969243,
       "split": "train"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "spearman",
-      "overall_score": 0.17041662173709923,
+      "overall_score": 0.22974469881113768,
       "split": "train"
     },
     {
       "baseline": "fit_score",
       "metric": "ndcg@10",
-      "overall_score": 0.8120564045734125,
+      "overall_score": 0.888096221669289,
       "split": "train"
     },
     {
       "baseline": "fit_score",
       "metric": "ndcg@20",
-      "overall_score": 0.8180326903103805,
+      "overall_score": 0.8709057878042217,
       "split": "train"
     },
     {
       "baseline": "fit_score",
       "metric": "spearman",
-      "overall_score": 0.13048147864599094,
+      "overall_score": 0.11010258253177313,
       "split": "train"
     },
     {
       "baseline": "review_volume_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7936940976872208,
+      "overall_score": 0.8047201292238364,
       "split": "train"
     },
     {
       "baseline": "review_volume_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7787341338137149,
+      "overall_score": 0.8162873372297554,
       "split": "train"
     },
     {
       "baseline": "review_volume_score",
       "metric": "spearman",
-      "overall_score": 0.0649129711729073,
+      "overall_score": 0.03932930792677482,
       "split": "train"
     },
     {
       "baseline": "blended_score",
       "metric": "ndcg@10",
-      "overall_score": 0.8894149515792048,
+      "overall_score": 0.8997371729401452,
       "split": "train"
     },
     {
       "baseline": "blended_score",
       "metric": "ndcg@20",
-      "overall_score": 0.8793801861933775,
+      "overall_score": 0.8983909752249235,
       "split": "train"
     },
     {
       "baseline": "blended_score",
       "metric": "spearman",
-      "overall_score": 0.2378063597093156,
+      "overall_score": 0.25668485721313467,
       "split": "train"
     },
     {
       "baseline": "random_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7647336478777494,
+      "overall_score": 0.7971404145579677,
       "split": "validation"
     },
     {
       "baseline": "random_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7797746881110724,
+      "overall_score": 0.7804177859835675,
       "split": "validation"
     },
     {
       "baseline": "random_score",
       "metric": "spearman",
-      "overall_score": 0.013398081153034895,
+      "overall_score": -0.006599637722335256,
       "split": "validation"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7843246431316854,
+      "overall_score": 0.8458790747873329,
       "split": "validation"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7815799432907937,
+      "overall_score": 0.8387448654235171,
       "split": "validation"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "spearman",
-      "overall_score": 0.14441128332411482,
+      "overall_score": 0.21540609744508432,
       "split": "validation"
     },
     {
       "baseline": "fit_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7855508358303673,
+      "overall_score": 0.8237044218779835,
       "split": "validation"
     },
     {
       "baseline": "fit_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7758595722539693,
+      "overall_score": 0.8337230615395715,
       "split": "validation"
     },
     {
       "baseline": "fit_score",
       "metric": "spearman",
-      "overall_score": 0.10563908100455925,
+      "overall_score": 0.08795439133401096,
       "split": "validation"
     },
     {
       "baseline": "review_volume_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7877268144034538,
+      "overall_score": 0.8038303550641168,
       "split": "validation"
     },
     {
       "baseline": "review_volume_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7742252344637692,
+      "overall_score": 0.8155909624193597,
       "split": "validation"
     },
     {
       "baseline": "review_volume_score",
       "metric": "spearman",
-      "overall_score": -0.02174946819999941,
+      "overall_score": 0.03974713418683748,
       "split": "validation"
     },
     {
       "baseline": "blended_score",
       "metric": "ndcg@10",
-      "overall_score": 0.8817135686258911,
+      "overall_score": 0.8749886119939408,
       "split": "validation"
     },
     {
       "baseline": "blended_score",
       "metric": "ndcg@20",
-      "overall_score": 0.8562688129606624,
+      "overall_score": 0.8802800536346679,
       "split": "validation"
     },
     {
       "baseline": "blended_score",
       "metric": "spearman",
-      "overall_score": 0.18017028020934664,
+      "overall_score": 0.23141896991204192,
       "split": "validation"
     },
     {
       "baseline": "random_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7773088201430998,
+      "overall_score": 0.7899546275342014,
       "split": "test"
     },
     {
       "baseline": "random_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7910144322336023,
+      "overall_score": 0.782917451179415,
       "split": "test"
     },
     {
       "baseline": "random_score",
       "metric": "spearman",
-      "overall_score": 0.026765841392659574,
+      "overall_score": 0.0005433803821416011,
       "split": "test"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "ndcg@10",
-      "overall_score": 0.8115563010248574,
+      "overall_score": 0.8319927650187218,
       "split": "test"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "ndcg@20",
-      "overall_score": 0.811455240177494,
+      "overall_score": 0.8378837032363895,
       "split": "test"
     },
     {
       "baseline": "mean_rating_score",
       "metric": "spearman",
-      "overall_score": 0.17646049062396477,
+      "overall_score": 0.23939269801103735,
       "split": "test"
     },
     {
       "baseline": "fit_score",
       "metric": "ndcg@10",
-      "overall_score": 0.8580744666147718,
+      "overall_score": 0.8365337502588129,
       "split": "test"
     },
     {
       "baseline": "fit_score",
       "metric": "ndcg@20",
-      "overall_score": 0.8399303872786827,
+      "overall_score": 0.83122347926453,
       "split": "test"
     },
     {
       "baseline": "fit_score",
       "metric": "spearman",
-      "overall_score": 0.07377104181497289,
+      "overall_score": 0.06400278524103983,
       "split": "test"
     },
     {
       "baseline": "review_volume_score",
       "metric": "ndcg@10",
-      "overall_score": 0.7778588242313008,
+      "overall_score": 0.77981550550297,
       "split": "test"
     },
     {
       "baseline": "review_volume_score",
       "metric": "ndcg@20",
-      "overall_score": 0.7791983618994638,
+      "overall_score": 0.7838042080037051,
       "split": "test"
     },
     {
       "baseline": "review_volume_score",
       "metric": "spearman",
-      "overall_score": 0.025387354537965385,
+      "overall_score": 0.06255659465030922,
       "split": "test"
     },
     {
       "baseline": "blended_score",
       "metric": "ndcg@10",
-      "overall_score": 0.8562244320575324,
+      "overall_score": 0.9016119970013848,
       "split": "test"
     },
     {
       "baseline": "blended_score",
       "metric": "ndcg@20",
-      "overall_score": 0.8354385531940117,
+      "overall_score": 0.8950226564614933,
       "split": "test"
     },
     {
       "baseline": "blended_score",
       "metric": "spearman",
-      "overall_score": 0.1731979799695124,
+      "overall_score": 0.2464575177198624,
       "split": "test"
     }
   ],

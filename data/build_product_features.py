@@ -8,11 +8,15 @@ import sys
 from collections import Counter
 from pathlib import Path
 
+
 DEFAULT_REVIEWS_PATH = Path("data/processed/reviews_canonical.parquet")
 DEFAULT_TAXONOMY_PATH = Path("data/processed/product_taxonomy.parquet")
 DEFAULT_OUTPUT_PATH = Path("data/processed/product_features.parquet")
 UNKNOWN_SUBCATEGORY = "unknown"
 UNKNOWN_RANKING_GROUP = "unknown"
+UNKNOWN_QUERY_GROUP = "unknown"
+RECENT_WINDOW_DAYS = 180
+RECENT_WINDOW_MS = RECENT_WINDOW_DAYS * 24 * 60 * 60 * 1000
 NEGATIVE_FIT_KEYWORDS = (
     "too small",
     "too big",
@@ -54,13 +58,65 @@ NEGATIVE_FIT_KEYWORDS = (
     "half size down",
     "not true to size",
 )
+TOO_SMALL_KEYWORDS = (
+    "too small",
+    "runs small",
+    "run small",
+    "way too small",
+    "size up",
+    "sized up",
+    "order a size up",
+    "go a size up",
+    "one size up",
+    "half size up",
+)
+TOO_LARGE_KEYWORDS = (
+    "too big",
+    "too large",
+    "runs large",
+    "run large",
+    "way too big",
+    "way too large",
+    "size down",
+    "sized down",
+    "order a size down",
+    "go a size down",
+    "one size down",
+    "half size down",
+)
+TIGHT_KEYWORDS = ("tight", "too tight", "very tight")
+LOOSE_KEYWORDS = ("loose", "too loose", "very loose")
+QUALITY_COMPLAINT_KEYWORDS = (
+    "poor quality",
+    "bad quality",
+    "quality issue",
+    "poorly made",
+    "cheaply made",
+    "cheap quality",
+    "cheap material",
+    "fell apart",
+    "falling apart",
+    "ripped",
+    "tore",
+    "torn",
+    "broke",
+    "broken",
+    "defective",
+    "itchy",
+    "scratchy",
+    "thin material",
+    "see through",
+)
 NON_ALNUM_RE = re.compile(r"[^a-z0-9]+")
 WHITESPACE_RE = re.compile(r"\s+")
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Build product-level features from canonical reviews and taxonomy."
+        description=(
+            "Build full-corpus product features for scoring and ranking from "
+            "canonical reviews and product taxonomy."
+        )
     )
     parser.add_argument(
         "--reviews-path",
@@ -110,6 +166,33 @@ def build_keyword_pattern(keywords: tuple[str, ...]) -> re.Pattern[str]:
     return re.compile(rf"(?<![a-z0-9])(?:{joined})(?![a-z0-9])")
 
 
+def derive_query_group_v2(ranking_group: object, subcategory: object) -> str:
+    ranking_group_value = str(ranking_group or "").strip().lower()
+    subcategory_value = str(subcategory or "").strip().lower()
+
+    if ranking_group_value == "tops":
+        if subcategory_value == "sweater":
+            return "tops_sweater"
+        if subcategory_value in {"t_shirt", "shirt_top"}:
+            return "tops_shirts"
+        return "tops_general"
+
+    if ranking_group_value == "bottoms":
+        if subcategory_value == "pants":
+            return "bottoms_pants"
+        return "bottoms_other"
+
+    if ranking_group_value == "outerwear":
+        return "outerwear"
+    if ranking_group_value == "dress":
+        return "dress"
+    if ranking_group_value == "footwear":
+        return "footwear"
+    if ranking_group_value == "intimates_sleep":
+        return "intimates_sleep"
+    return UNKNOWN_QUERY_GROUP
+
+
 def percentile(sorted_values: list[float], q: float) -> float:
     if not sorted_values:
         return 0.0
@@ -127,6 +210,17 @@ def validate_required_columns(frame, required_columns: set[str], name: str) -> N
     missing = sorted(required_columns - set(frame.columns))
     if missing:
         raise ValueError(f"{name} is missing required columns: {', '.join(missing)}")
+
+
+def validate_one_value_per_asin(reviews, column: str) -> None:
+    non_null_counts = reviews.groupby("asin")[column].nunique(dropna=True)
+    conflicting = non_null_counts[non_null_counts > 1]
+    if conflicting.empty:
+        return
+    sample = ", ".join(conflicting.index.astype(str).tolist()[:5])
+    raise ValueError(
+        f"Each ASIN must map to at most one non-null {column}. Conflicting ASINs: {sample}"
+    )
 
 
 def print_audit_summary(
@@ -147,7 +241,10 @@ def print_audit_summary(
     fit_rates = sorted(features["fit_complaint_rate"].astype(float).tolist())
     subcategory_counts = Counter(features["subcategory"].tolist())
     ranking_group_counts = Counter(features["ranking_group"].tolist())
+    query_group_counts = Counter(features["query_group_v2"].tolist())
     apparel_count = int(features["is_apparel"].sum())
+    rankable_mask = features["query_group_v2"] != UNKNOWN_QUERY_GROUP
+    rankable_count = int(rankable_mask.sum())
 
     print()
     print("Product features build complete")
@@ -173,9 +270,20 @@ def print_audit_summary(
         print(f"  {ranking_group}: {count}")
 
     print()
+    print("Query group distribution")
+    for query_group, count in query_group_counts.most_common():
+        print(f"  {query_group}: {count}")
+
+    print()
     print("Apparel coverage")
     print(f"  apparel_products: {apparel_count}")
-    print(f"  apparel_product_pct: {(apparel_count / total_products * 100.0) if total_products else 0.0:.2f}%")
+    print(
+        f"  apparel_product_pct: {(apparel_count / total_products * 100.0) if total_products else 0.0:.2f}%"
+    )
+    print(f"  rankable_products: {rankable_count}")
+    print(
+        f"  rankable_product_pct: {(rankable_count / total_products * 100.0) if total_products else 0.0:.2f}%"
+    )
 
     print()
     print("Reviews per product summary")
@@ -225,22 +333,38 @@ def main() -> int:
         print("Loading parquet inputs...")
         reviews = pd.read_parquet(
             reviews_path,
-            columns=["asin", "parent_asin", "category", "rating", "review_text"],
+            columns=[
+                "asin",
+                "parent_asin",
+                "category",
+                "rating",
+                "review_text",
+                "timestamp",
+                "verified_purchase",
+                "helpful_votes",
+            ],
         )
         taxonomy = pd.read_parquet(
             taxonomy_path,
             columns=["parent_asin", "subcategory", "ranking_group", "is_apparel"],
         )
-        print(
-            f"Loaded {len(reviews):,} review rows and {len(taxonomy):,} taxonomy rows."
-        )
+        print(f"Loaded {len(reviews):,} review rows and {len(taxonomy):,} taxonomy rows.")
     except Exception as exc:
         print(f"Failed to load parquet inputs: {exc}", file=sys.stderr)
         return 1
 
     validate_required_columns(
         reviews,
-        {"asin", "parent_asin", "category", "rating", "review_text"},
+        {
+            "asin",
+            "parent_asin",
+            "category",
+            "rating",
+            "review_text",
+            "timestamp",
+            "verified_purchase",
+            "helpful_votes",
+        },
         str(reviews_path),
     )
     validate_required_columns(
@@ -255,8 +379,6 @@ def main() -> int:
         raise ValueError(f"Taxonomy contains duplicate parent_asin values: {sample}")
 
     reviews = reviews.copy()
-    print("Deriving negative fit complaint flag...")
-    negative_fit_pattern = build_keyword_pattern(NEGATIVE_FIT_KEYWORDS)
     normalized_review_text = (
         reviews["review_text"]
         .fillna("")
@@ -266,22 +388,61 @@ def main() -> int:
         .str.replace(WHITESPACE_RE, " ", regex=True)
         .str.strip()
     )
+
+    print("Deriving review-level feature flags...")
+    negative_fit_pattern = build_keyword_pattern(NEGATIVE_FIT_KEYWORDS)
+    too_small_pattern = build_keyword_pattern(TOO_SMALL_KEYWORDS)
+    too_large_pattern = build_keyword_pattern(TOO_LARGE_KEYWORDS)
+    tight_pattern = build_keyword_pattern(TIGHT_KEYWORDS)
+    loose_pattern = build_keyword_pattern(LOOSE_KEYWORDS)
+    quality_pattern = build_keyword_pattern(QUALITY_COMPLAINT_KEYWORDS)
+
     reviews["is_negative_fit_complaint"] = normalized_review_text.str.contains(
         negative_fit_pattern,
         regex=True,
         na=False,
     )
-    reviews = reviews.drop(columns=["review_text"])
+    reviews["is_too_small"] = normalized_review_text.str.contains(
+        too_small_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_too_large"] = normalized_review_text.str.contains(
+        too_large_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_tight"] = normalized_review_text.str.contains(
+        tight_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_loose"] = normalized_review_text.str.contains(
+        loose_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_quality_complaint"] = normalized_review_text.str.contains(
+        quality_pattern,
+        regex=True,
+        na=False,
+    )
+    reviews["is_low_star"] = reviews["rating"].astype(float) <= 2.0
+    reviews["is_high_star"] = reviews["rating"].astype(float) >= 4.0
+    reviews["verified_purchase_numeric"] = (
+        reviews["verified_purchase"].fillna(False).astype(bool).astype(float)
+    )
+    reviews["helpful_votes_filled"] = (
+        pd.to_numeric(reviews["helpful_votes"], errors="coerce")
+        .fillna(0.0)
+        .clip(lower=0.0)
+        .astype(float)
+    )
+    reviews = reviews.drop(columns=["review_text", "verified_purchase", "helpful_votes"])
 
-    print("Validating ASIN to parent_asin mappings...")
-    non_null_parent_counts = reviews.groupby("asin")["parent_asin"].nunique(dropna=True)
-    conflicting_parent_asins = non_null_parent_counts[non_null_parent_counts > 1]
-    if not conflicting_parent_asins.empty:
-        sample = ", ".join(conflicting_parent_asins.index.astype(str).tolist()[:5])
-        raise ValueError(
-            "Each ASIN must map to at most one non-null parent_asin. "
-            f"Conflicting ASINs: {sample}"
-        )
+    print("Validating ASIN mappings...")
+    validate_one_value_per_asin(reviews, "parent_asin")
+    validate_one_value_per_asin(reviews, "category")
 
     print("Aggregating product features...")
     grouped = reviews.groupby("asin", sort=False)
@@ -291,6 +452,16 @@ def main() -> int:
         mean_rating=("rating", "mean"),
         review_count=("rating", "size"),
         fit_complaint_rate=("is_negative_fit_complaint", "mean"),
+        low_star_rate=("is_low_star", "mean"),
+        high_star_rate=("is_high_star", "mean"),
+        too_small_rate=("is_too_small", "mean"),
+        too_large_rate=("is_too_large", "mean"),
+        tight_rate=("is_tight", "mean"),
+        loose_rate=("is_loose", "mean"),
+        quality_complaint_rate=("is_quality_complaint", "mean"),
+        verified_purchase_rate=("verified_purchase_numeric", "mean"),
+        helpful_votes_mean=("helpful_votes_filled", "mean"),
+        helpful_votes_sum=("helpful_votes_filled", "sum"),
     )
     features["rating_variance"] = grouped["rating"].var(ddof=0).astype(float)
     features = features.reset_index()
@@ -302,7 +473,40 @@ def main() -> int:
     features["mean_rating"] = features["mean_rating"].astype(float)
     features["review_count"] = features["review_count"].astype(int)
     features["log_review_count"] = features["review_count"].map(math.log1p).astype(float)
-    features["fit_complaint_rate"] = features["fit_complaint_rate"].astype(float)
+    for column in (
+        "fit_complaint_rate",
+        "low_star_rate",
+        "high_star_rate",
+        "too_small_rate",
+        "too_large_rate",
+        "tight_rate",
+        "loose_rate",
+        "quality_complaint_rate",
+        "verified_purchase_rate",
+        "helpful_votes_mean",
+    ):
+        features[column] = features[column].astype(float)
+    features["helpful_votes_sum"] = features["helpful_votes_sum"].astype(float)
+    features["helpful_votes_sum_log"] = features["helpful_votes_sum"].map(math.log1p).astype(float)
+    features = features.drop(columns=["helpful_votes_sum"])
+
+    # Anchor recent features to the latest review timestamp in the full corpus.
+    max_timestamp = int(reviews["timestamp"].max())
+    recent_window_start = max_timestamp - RECENT_WINDOW_MS
+    recent = (
+        reviews.loc[reviews["timestamp"] > recent_window_start]
+        .groupby("asin", sort=False)
+        .agg(
+            recent_review_count=("rating", "size"),
+            recent_mean_rating=("rating", "mean"),
+        )
+        .reset_index()
+    )
+    features = features.merge(recent, on="asin", how="left")
+    features["recent_review_count"] = features["recent_review_count"].fillna(0).astype(int)
+    features["recent_mean_rating"] = (
+        features["recent_mean_rating"].fillna(features["mean_rating"]).astype(float)
+    )
 
     print("Joining taxonomy...")
     features = features.merge(taxonomy, on="parent_asin", how="left")
@@ -312,6 +516,14 @@ def main() -> int:
     features["subcategory"] = features["subcategory"].fillna(UNKNOWN_SUBCATEGORY)
     features["ranking_group"] = features["ranking_group"].fillna(UNKNOWN_RANKING_GROUP)
     features["is_apparel"] = features["is_apparel"].fillna(False).astype(bool)
+    features["query_group_v2"] = [
+        derive_query_group_v2(ranking_group=ranking_group, subcategory=subcategory)
+        for ranking_group, subcategory in zip(
+            features["ranking_group"],
+            features["subcategory"],
+            strict=True,
+        )
+    ]
 
     output_columns = [
         "asin",
@@ -319,12 +531,25 @@ def main() -> int:
         "category",
         "subcategory",
         "ranking_group",
+        "query_group_v2",
         "is_apparel",
         "mean_rating",
         "rating_variance",
         "review_count",
         "log_review_count",
         "fit_complaint_rate",
+        "low_star_rate",
+        "high_star_rate",
+        "too_small_rate",
+        "too_large_rate",
+        "tight_rate",
+        "loose_rate",
+        "quality_complaint_rate",
+        "verified_purchase_rate",
+        "helpful_votes_mean",
+        "helpful_votes_sum_log",
+        "recent_review_count",
+        "recent_mean_rating",
     ]
     features = features.loc[:, output_columns]
 
@@ -332,11 +557,28 @@ def main() -> int:
         raise ValueError("Output contains duplicate ASIN rows.")
     if (features["review_count"] < 1).any():
         raise ValueError("All products must have review_count >= 1.")
-    invalid_fit_rates = (features["fit_complaint_rate"] < 0.0) | (
-        features["fit_complaint_rate"] > 1.0
-    )
-    if invalid_fit_rates.any():
-        raise ValueError("fit_complaint_rate must stay within [0, 1].")
+    for column in (
+        "fit_complaint_rate",
+        "low_star_rate",
+        "high_star_rate",
+        "too_small_rate",
+        "too_large_rate",
+        "tight_rate",
+        "loose_rate",
+        "quality_complaint_rate",
+        "verified_purchase_rate",
+    ):
+        invalid = (features[column] < 0.0) | (features[column] > 1.0)
+        if invalid.any():
+            raise ValueError(f"{column} must stay within [0, 1].")
+    if (features["helpful_votes_mean"] < 0.0).any():
+        raise ValueError("helpful_votes_mean must be non-negative.")
+    if (features["helpful_votes_sum_log"] < 0.0).any():
+        raise ValueError("helpful_votes_sum_log must be non-negative.")
+    if (features["recent_review_count"] < 0).any():
+        raise ValueError("recent_review_count must be non-negative.")
+    if ((features["recent_mean_rating"] < 1.0) | (features["recent_mean_rating"] > 5.0)).any():
+        raise ValueError("recent_mean_rating must stay within [1, 5].")
 
     print("Writing product features parquet...")
     output_path.parent.mkdir(parents=True, exist_ok=True)

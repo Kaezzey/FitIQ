@@ -120,12 +120,20 @@ def main() -> int:
     print(f"Dataset path: {dataset_path}")
     if manifest is not None:
         print(f"Manifest path: {manifest_path}")
+        if "label_version" in manifest:
+            print(f"Label version: {manifest['label_version']}")
+        if "query_group_version" in manifest:
+            print(f"Query group version: {manifest['query_group_version']}")
 
     print()
     print("Dataset coverage")
     print(f"  total_rows: {len(dataset)}")
     print(f"  unique_asins: {dataset['asin'].nunique()}")
     print(f"  splits: {', '.join(dataset['split'].drop_duplicates().tolist())}")
+    print_count_block(
+        "row_counts_by_query_group",
+        dataset["query_group_v2"].value_counts().items(),
+    )
     print_count_block(
         "row_counts_by_ranking_group",
         dataset["ranking_group"].value_counts().items(),
@@ -191,6 +199,7 @@ def main() -> int:
         print(f"{split_name.title()} split")
         print(f"  rows: {len(split_frame)}")
         print(f"  unique_asins: {split_frame['asin'].nunique()}")
+        print(f"  query_groups: {split_frame['query_group_v2'].nunique()}")
         print(f"  ranking_groups: {split_frame['ranking_group'].nunique()}")
         print(f"  subcategories: {split_frame['subcategory'].nunique()}")
         print_numeric_summary(
@@ -202,6 +211,12 @@ def main() -> int:
             "future_review_count_summary",
             split_frame["future_review_count"].astype(float).tolist(),
             decimals=2,
+        )
+        print_count_block(
+            "row_counts_by_query_group",
+            split_frame["query_group_v2"].value_counts().items()
+            if not split_frame.empty
+            else [],
         )
         print_count_block(
             "row_counts_by_ranking_group",
@@ -227,12 +242,12 @@ def main() -> int:
         if manifest is not None:
             split_manifest = manifest["splits"].get(split_name, {})
             print_count_block(
-                "eligible_ranking_groups",
-                split_manifest.get("eligible_ranking_groups", {}).items(),
+                "eligible_query_groups",
+                split_manifest.get("eligible_query_groups", {}).items(),
             )
             print_count_block(
-                "excluded_ranking_groups",
-                split_manifest.get("excluded_ranking_groups", {}).items(),
+                "excluded_query_groups",
+                split_manifest.get("excluded_query_groups", {}).items(),
             )
 
     return 0
