@@ -14,6 +14,9 @@ The project currently includes:
 - a read-only FastAPI service
 - a Tkinter desktop demo client
 
+  <img width="2560" height="1373" alt="image" src="https://github.com/user-attachments/assets/99d83d91-b7ed-49c7-8f4b-30b22781e504" />
+
+
 ## Main idea
 
 The system uses weak public signals from reviews and metadata:
