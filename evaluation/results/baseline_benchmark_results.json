@@ -6,9 +6,9 @@
       "bottoms_pants",
       "dress",
       "footwear",
+      "general_items",
       "intimates_sleep",
       "outerwear",
-      "tops_general",
       "tops_shirts",
       "tops_sweater"
     ],
@@ -28,7 +28,7 @@
     "total_rows": 29505,
     "unique_asins": 24340
   },
-  "generated_at_utc": "2026-04-03T13:54:55.594724+00:00",
+  "generated_at_utc": "2026-04-04T03:53:24.768912+00:00",
   "random_seed": 20260401,
   "splits": {
     "test": {
@@ -68,6 +68,13 @@
               "spearman": 0.18262441648484146,
               "unique_asins": 811
             },
+            "general_items": {
+              "ndcg@10": 0.9004244535671709,
+              "ndcg@20": 0.9229123591830544,
+              "row_count": 1553,
+              "spearman": 0.32295601282347275,
+              "unique_asins": 1553
+            },
             "intimates_sleep": {
               "ndcg@10": 0.9246123579680562,
               "ndcg@20": 0.9237236254422144,
@@ -81,13 +88,6 @@
               "row_count": 309,
               "spearman": 0.2993978634078487,
               "unique_asins": 309
-            },
-            "tops_general": {
-              "ndcg@10": 0.9004244535671709,
-              "ndcg@20": 0.9229123591830544,
-              "row_count": 1553,
-              "spearman": 0.32295601282347275,
-              "unique_asins": 1553
             },
             "tops_shirts": {
               "ndcg@10": 0.9392309330873148,
@@ -176,6 +176,13 @@
               "spearman": 0.0767065206079174,
               "unique_asins": 811
             },
+            "general_items": {
+              "ndcg@10": 0.9164784611116303,
+              "ndcg@20": 0.8658335823308629,
+              "row_count": 1553,
+              "spearman": 0.12940770766005216,
+              "unique_asins": 1553
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8983117274357172,
               "ndcg@20": 0.8646262204825642,
@@ -189,13 +196,6 @@
               "row_count": 309,
               "spearman": 0.11201809294664866,
               "unique_asins": 309
-            },
-            "tops_general": {
-              "ndcg@10": 0.9164784611116303,
-              "ndcg@20": 0.8658335823308629,
-              "row_count": 1553,
-              "spearman": 0.12940770766005216,
-              "unique_asins": 1553
             },
             "tops_shirts": {
               "ndcg@10": 0.685937219974842,
@@ -284,6 +284,13 @@
               "spearman": 0.1315201797315229,
               "unique_asins": 811
             },
+            "general_items": {
+              "ndcg@10": 0.9228721808160227,
+              "ndcg@20": 0.9183996077209037,
+              "row_count": 1553,
+              "spearman": 0.29527154668717676,
+              "unique_asins": 1553
+            },
             "intimates_sleep": {
               "ndcg@10": 0.7489089206153824,
               "ndcg@20": 0.795473745686114,
@@ -297,13 +304,6 @@
               "row_count": 309,
               "spearman": 0.26320132796755447,
               "unique_asins": 309
-            },
-            "tops_general": {
-              "ndcg@10": 0.9228721808160227,
-              "ndcg@20": 0.9183996077209037,
-              "row_count": 1553,
-              "spearman": 0.29527154668717676,
-              "unique_asins": 1553
             },
             "tops_shirts": {
               "ndcg@10": 0.809901053149976,
@@ -392,6 +392,13 @@
               "spearman": 0.05103394072632365,
               "unique_asins": 811
             },
+            "general_items": {
+              "ndcg@10": 0.8147334859948746,
+              "ndcg@20": 0.8127659338062602,
+              "row_count": 1553,
+              "spearman": -0.024710507164278587,
+              "unique_asins": 1553
+            },
             "intimates_sleep": {
               "ndcg@10": 0.6976644618955425,
               "ndcg@20": 0.7654219380798517,
@@ -405,13 +412,6 @@
               "row_count": 309,
               "spearman": 0.05012568197567936,
               "unique_asins": 309
-            },
-            "tops_general": {
-              "ndcg@10": 0.8147334859948746,
-              "ndcg@20": 0.8127659338062602,
-              "row_count": 1553,
-              "spearman": -0.024710507164278587,
-              "unique_asins": 1553
             },
             "tops_shirts": {
               "ndcg@10": 0.7749472793349719,
@@ -500,6 +500,13 @@
               "spearman": 0.08321106694383769,
               "unique_asins": 811
             },
+            "general_items": {
+              "ndcg@10": 0.7995335948327562,
+              "ndcg@20": 0.7981248114471472,
+              "row_count": 1553,
+              "spearman": 0.05424876583228134,
+              "unique_asins": 1553
+            },
             "intimates_sleep": {
               "ndcg@10": 0.7754398284290037,
               "ndcg@20": 0.7703440082102647,
@@ -513,13 +520,6 @@
               "row_count": 309,
               "spearman": 0.052453836359670505,
               "unique_asins": 309
-            },
-            "tops_general": {
-              "ndcg@10": 0.7995335948327562,
-              "ndcg@20": 0.7981248114471472,
-              "row_count": 1553,
-              "spearman": 0.05424876583228134,
-              "unique_asins": 1553
             },
             "tops_shirts": {
               "ndcg@10": 0.7500724771434195,
@@ -579,9 +579,9 @@
         "bottoms_pants": 644,
         "dress": 675,
         "footwear": 811,
+        "general_items": 1553,
         "intimates_sleep": 269,
         "outerwear": 309,
-        "tops_general": 1553,
         "tops_shirts": 1189,
         "tops_sweater": 959
       },
@@ -644,6 +644,13 @@
               "spearman": 0.24526880895907063,
               "unique_asins": 1196
             },
+            "general_items": {
+              "ndcg@10": 0.9430505929369629,
+              "ndcg@20": 0.9251894648088743,
+              "row_count": 3107,
+              "spearman": 0.25354242014120154,
+              "unique_asins": 3107
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8653809995338658,
               "ndcg@20": 0.863172950816495,
@@ -657,13 +664,6 @@
               "row_count": 479,
               "spearman": 0.3000991493231859,
               "unique_asins": 479
-            },
-            "tops_general": {
-              "ndcg@10": 0.9430505929369629,
-              "ndcg@20": 0.9251894648088743,
-              "row_count": 3107,
-              "spearman": 0.25354242014120154,
-              "unique_asins": 3107
             },
             "tops_shirts": {
               "ndcg@10": 0.9248990552708403,
@@ -752,6 +752,13 @@
               "spearman": 0.05195591459243727,
               "unique_asins": 1196
             },
+            "general_items": {
+              "ndcg@10": 0.978516495022769,
+              "ndcg@20": 0.9308853571597521,
+              "row_count": 3107,
+              "spearman": 0.12776252700988017,
+              "unique_asins": 3107
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8294411075568845,
               "ndcg@20": 0.8619552389555302,
@@ -765,13 +772,6 @@
               "row_count": 479,
               "spearman": 0.13041479854371651,
               "unique_asins": 479
-            },
-            "tops_general": {
-              "ndcg@10": 0.978516495022769,
-              "ndcg@20": 0.9308853571597521,
-              "row_count": 3107,
-              "spearman": 0.12776252700988017,
-              "unique_asins": 3107
             },
             "tops_shirts": {
               "ndcg@10": 0.875111429982536,
@@ -860,6 +860,13 @@
               "spearman": 0.22154924844157656,
               "unique_asins": 1196
             },
+            "general_items": {
+              "ndcg@10": 0.9102756990259361,
+              "ndcg@20": 0.9323785831177954,
+              "row_count": 3107,
+              "spearman": 0.23004904225949782,
+              "unique_asins": 3107
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8267811874667247,
               "ndcg@20": 0.8609910771109927,
@@ -873,13 +880,6 @@
               "row_count": 479,
               "spearman": 0.2533697039111747,
               "unique_asins": 479
-            },
-            "tops_general": {
-              "ndcg@10": 0.9102756990259361,
-              "ndcg@20": 0.9323785831177954,
-              "row_count": 3107,
-              "spearman": 0.23004904225949782,
-              "unique_asins": 3107
             },
             "tops_shirts": {
               "ndcg@10": 0.7722379913120798,
@@ -968,6 +968,13 @@
               "spearman": 0.008294474431919602,
               "unique_asins": 1196
             },
+            "general_items": {
+              "ndcg@10": 0.7976270336689352,
+              "ndcg@20": 0.7707305500916107,
+              "row_count": 3107,
+              "spearman": 0.007211268514787553,
+              "unique_asins": 3107
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8581729112479346,
               "ndcg@20": 0.8740686266218507,
@@ -981,13 +988,6 @@
               "row_count": 479,
               "spearman": 0.1098888462666405,
               "unique_asins": 479
-            },
-            "tops_general": {
-              "ndcg@10": 0.7976270336689352,
-              "ndcg@20": 0.7707305500916107,
-              "row_count": 3107,
-              "spearman": 0.007211268514787553,
-              "unique_asins": 3107
             },
             "tops_shirts": {
               "ndcg@10": 0.6578245471737953,
@@ -1076,6 +1076,13 @@
               "spearman": 0.056762654614351656,
               "unique_asins": 1196
             },
+            "general_items": {
+              "ndcg@10": 0.7508721341152952,
+              "ndcg@20": 0.803291028248653,
+              "row_count": 3107,
+              "spearman": 0.005875765918275544,
+              "unique_asins": 3107
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8397477744387508,
               "ndcg@20": 0.8311608174509584,
@@ -1089,13 +1096,6 @@
               "row_count": 479,
               "spearman": 0.07894796076931937,
               "unique_asins": 479
-            },
-            "tops_general": {
-              "ndcg@10": 0.7508721341152952,
-              "ndcg@20": 0.803291028248653,
-              "row_count": 3107,
-              "spearman": 0.005875765918275544,
-              "unique_asins": 3107
             },
             "tops_shirts": {
               "ndcg@10": 0.7295968467395534,
@@ -1155,9 +1155,9 @@
         "bottoms_pants": 889,
         "dress": 1878,
         "footwear": 1196,
+        "general_items": 3107,
         "intimates_sleep": 702,
         "outerwear": 479,
-        "tops_general": 3107,
         "tops_shirts": 2079,
         "tops_sweater": 1448
       },
@@ -1220,6 +1220,13 @@
               "spearman": 0.27772889723409433,
               "unique_asins": 849
             },
+            "general_items": {
+              "ndcg@10": 0.8674828481743391,
+              "ndcg@20": 0.9112727589275146,
+              "row_count": 2250,
+              "spearman": 0.25582179952983936,
+              "unique_asins": 2250
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8603483668584998,
               "ndcg@20": 0.8508470759183789,
@@ -1233,13 +1240,6 @@
               "row_count": 332,
               "spearman": 0.32582871049901707,
               "unique_asins": 332
-            },
-            "tops_general": {
-              "ndcg@10": 0.8674828481743391,
-              "ndcg@20": 0.9112727589275146,
-              "row_count": 2250,
-              "spearman": 0.25582179952983936,
-              "unique_asins": 2250
             },
             "tops_shirts": {
               "ndcg@10": 0.9149741612512534,
@@ -1328,6 +1328,13 @@
               "spearman": 0.10631348600475755,
               "unique_asins": 849
             },
+            "general_items": {
+              "ndcg@10": 0.9017379232027437,
+              "ndcg@20": 0.9141877179737394,
+              "row_count": 2250,
+              "spearman": 0.11151287571509225,
+              "unique_asins": 2250
+            },
             "intimates_sleep": {
               "ndcg@10": 0.7563650998736324,
               "ndcg@20": 0.8000396549594961,
@@ -1341,13 +1348,6 @@
               "row_count": 332,
               "spearman": 0.1303121452330004,
               "unique_asins": 332
-            },
-            "tops_general": {
-              "ndcg@10": 0.9017379232027437,
-              "ndcg@20": 0.9141877179737394,
-              "row_count": 2250,
-              "spearman": 0.11151287571509225,
-              "unique_asins": 2250
             },
             "tops_shirts": {
               "ndcg@10": 0.6708154735454152,
@@ -1436,6 +1436,13 @@
               "spearman": 0.2415808107338907,
               "unique_asins": 849
             },
+            "general_items": {
+              "ndcg@10": 0.9102971693430995,
+              "ndcg@20": 0.9163129192577318,
+              "row_count": 2250,
+              "spearman": 0.22855878345205313,
+              "unique_asins": 2250
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8825901123961413,
               "ndcg@20": 0.8592730907577062,
@@ -1449,13 +1456,6 @@
               "row_count": 332,
               "spearman": 0.2968579815718705,
               "unique_asins": 332
-            },
-            "tops_general": {
-              "ndcg@10": 0.9102971693430995,
-              "ndcg@20": 0.9163129192577318,
-              "row_count": 2250,
-              "spearman": 0.22855878345205313,
-              "unique_asins": 2250
             },
             "tops_shirts": {
               "ndcg@10": 0.8196011249352503,
@@ -1544,6 +1544,13 @@
               "spearman": 0.015519922813810651,
               "unique_asins": 849
             },
+            "general_items": {
+              "ndcg@10": 0.7678217469623568,
+              "ndcg@20": 0.7551915831806197,
+              "row_count": 2250,
+              "spearman": -0.00869827778574929,
+              "unique_asins": 2250
+            },
             "intimates_sleep": {
               "ndcg@10": 0.8712018570998996,
               "ndcg@20": 0.8187125912238242,
@@ -1557,13 +1564,6 @@
               "row_count": 332,
               "spearman": 0.06443085295214679,
               "unique_asins": 332
-            },
-            "tops_general": {
-              "ndcg@10": 0.7678217469623568,
-              "ndcg@20": 0.7551915831806197,
-              "row_count": 2250,
-              "spearman": -0.00869827778574929,
-              "unique_asins": 2250
             },
             "tops_shirts": {
               "ndcg@10": 0.7752578148230961,
@@ -1652,6 +1652,13 @@
               "spearman": 0.03743810781979268,
               "unique_asins": 849
             },
+            "general_items": {
+              "ndcg@10": 0.846875540104236,
+              "ndcg@20": 0.8374393057747065,
+              "row_count": 2250,
+              "spearman": 0.04366696407377973,
+              "unique_asins": 2250
+            },
             "intimates_sleep": {
               "ndcg@10": 0.7014810197683743,
               "ndcg@20": 0.7647423895178409,
@@ -1665,13 +1672,6 @@
               "row_count": 332,
               "spearman": 0.06216911550847005,
               "unique_asins": 332
-            },
-            "tops_general": {
-              "ndcg@10": 0.846875540104236,
-              "ndcg@20": 0.8374393057747065,
-              "row_count": 2250,
-              "spearman": 0.04366696407377973,
-              "unique_asins": 2250
             },
             "tops_shirts": {
               "ndcg@10": 0.749202205964517,
@@ -1731,9 +1731,9 @@
         "bottoms_pants": 1021,
         "dress": 893,
         "footwear": 849,
+        "general_items": 2250,
         "intimates_sleep": 394,
         "outerwear": 332,
-        "tops_general": 2250,
         "tops_shirts": 1685,
         "tops_sweater": 1229
       },

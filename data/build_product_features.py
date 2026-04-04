@@ -175,7 +175,7 @@ def derive_query_group_v2(ranking_group: object, subcategory: object) -> str:
             return "tops_sweater"
         if subcategory_value in {"t_shirt", "shirt_top"}:
             return "tops_shirts"
-        return "tops_general"
+        return "general_items"
 
     if ranking_group_value == "bottoms":
         if subcategory_value == "pants":

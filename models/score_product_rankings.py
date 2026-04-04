@@ -28,6 +28,11 @@ DEFAULT_MODEL_PATH = Path("models/artifacts/tuned_catboost_ranker.cbm")
 DEFAULT_POLICY_PATH = Path("models/artifacts/query_group_hybrid_policy.json")
 DEFAULT_OUTPUT_PATH = Path("data/processed/product_rankings_v1.parquet")
 DEFAULT_SUMMARY_OUTPUT_PATH = Path("data/processed/product_rankings_v1_summary.json")
+DEFAULT_MANIFEST_OUTPUT_PATH = Path("data/processed/fitiq_v1_manifest.json")
+ARTIFACT_VERSION = "product_rankings_v1"
+CHAMPION_NAME = "query_group_hybrid_v1"
+QUERY_GROUP_COLUMN = "query_group_v2"
+RANKING_GROUP_COLUMN = "ranking_group"
 UNKNOWN_QUERY_GROUP = "unknown"
 PREDICTION_COLUMN = "prediction_catboost_ranker_tuned"
 FINAL_SCORE_COLUMN = "score_fitiq_v1"
@@ -79,6 +84,12 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DEFAULT_SUMMARY_OUTPUT_PATH,
         help="Destination JSON path for a scoring summary.",
+    )
+    parser.add_argument(
+        "--manifest-output-path",
+        type=Path,
+        default=DEFAULT_MANIFEST_OUTPUT_PATH,
+        help="Destination JSON path for the frozen FitIQ v1 manifest.",
     )
     return parser.parse_args()
 
@@ -190,11 +201,15 @@ def build_summary(
         ]
 
     return {
+        "artifact_version": ARTIFACT_VERSION,
+        "champion_name": CHAMPION_NAME,
         "generated_at_utc": datetime.now(tz=UTC).isoformat(),
         "features_path": str(features_path),
         "model_path": str(model_path),
         "policy_path": str(policy_path),
         "output_path": str(output_path),
+        "query_group_column": QUERY_GROUP_COLUMN,
+        "ranking_group_column": RANKING_GROUP_COLUMN,
         "score_column": FINAL_SCORE_COLUMN,
         "dataset_summary": {
             "total_ranked_products": int(len(ranked)),
@@ -207,7 +222,56 @@ def build_summary(
     }
 
 
-def print_summary(ranked, output_path: Path, summary_output_path: Path) -> None:
+def relative_artifact_path(path: Path) -> str:
+    resolved = path.resolve()
+    try:
+        return str(resolved.relative_to(PROJECT_ROOT.resolve()))
+    except ValueError:
+        return str(resolved)
+
+
+def build_version_manifest(
+    features_path: Path,
+    model_path: Path,
+    policy_path: Path,
+    output_path: Path,
+    summary_output_path: Path,
+    manifest_output_path: Path,
+    ranked,
+) -> dict[str, object]:
+    query_groups = sorted(ranked[QUERY_GROUP_COLUMN].dropna().astype(str).unique().tolist())
+    return {
+        "artifact_version": ARTIFACT_VERSION,
+        "champion_name": CHAMPION_NAME,
+        "generated_at_utc": datetime.now(tz=UTC).isoformat(),
+        "score_column": FINAL_SCORE_COLUMN,
+        "query_group_contract": {
+            "query_group_column": QUERY_GROUP_COLUMN,
+            "ranking_group_column": RANKING_GROUP_COLUMN,
+            "unknown_query_group_value": UNKNOWN_QUERY_GROUP,
+            "query_groups": query_groups,
+        },
+        "artifacts": {
+            "reviews_canonical": relative_artifact_path(PROJECT_ROOT / "data/processed/reviews_canonical.parquet"),
+            "product_taxonomy": relative_artifact_path(PROJECT_ROOT / "data/processed/product_taxonomy.parquet"),
+            "product_features": relative_artifact_path(features_path),
+            "ranking_eval_dataset": relative_artifact_path(PROJECT_ROOT / "data/processed/ranking_eval_dataset.parquet"),
+            "baseline_results": relative_artifact_path(PROJECT_ROOT / "evaluation/results/baseline_benchmark_results.json"),
+            "tuned_catboost_ranker_model": relative_artifact_path(model_path),
+            "query_group_hybrid_policy": relative_artifact_path(policy_path),
+            "serving_rankings": relative_artifact_path(output_path),
+            "serving_summary": relative_artifact_path(summary_output_path),
+            "serving_manifest": relative_artifact_path(manifest_output_path),
+        },
+    }
+
+
+def print_summary(
+    ranked,
+    output_path: Path,
+    summary_output_path: Path,
+    manifest_output_path: Path,
+) -> None:
     query_group_counts = Counter(ranked["query_group_v2"].tolist())
     ranking_group_counts = Counter(ranked["ranking_group"].tolist())
     policy_source_counts = Counter(ranked["policy_source"].tolist())
@@ -216,6 +280,7 @@ def print_summary(ranked, output_path: Path, summary_output_path: Path) -> None:
     print("Product ranking build complete")
     print(f"Output path: {output_path}")
     print(f"Summary path: {summary_output_path}")
+    print(f"Manifest path: {manifest_output_path}")
 
     print()
     print("Ranking coverage")
@@ -245,6 +310,7 @@ def main() -> int:
     policy_path = normalize_path(args.policy_path)
     output_path = normalize_path(args.output_path)
     summary_output_path = normalize_path(args.summary_output_path)
+    manifest_output_path = normalize_path(args.manifest_output_path)
 
     for path in (features_path, model_path, policy_path):
         if not path.exists():
@@ -341,6 +407,7 @@ def main() -> int:
     print("Writing ranked product artifacts...")
     output_path.parent.mkdir(parents=True, exist_ok=True)
     summary_output_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_output_path.parent.mkdir(parents=True, exist_ok=True)
     ranked.to_parquet(output_path, index=False)
     summary_payload = build_summary(
         features_path=features_path,
@@ -350,8 +417,23 @@ def main() -> int:
         ranked=ranked,
     )
     summary_output_path.write_text(json.dumps(summary_payload, indent=2), encoding="utf-8")
+    manifest_payload = build_version_manifest(
+        features_path=features_path,
+        model_path=model_path,
+        policy_path=policy_path,
+        output_path=output_path,
+        summary_output_path=summary_output_path,
+        manifest_output_path=manifest_output_path,
+        ranked=ranked,
+    )
+    manifest_output_path.write_text(json.dumps(manifest_payload, indent=2), encoding="utf-8")
 
-    print_summary(ranked=ranked, output_path=output_path, summary_output_path=summary_output_path)
+    print_summary(
+        ranked=ranked,
+        output_path=output_path,
+        summary_output_path=summary_output_path,
+        manifest_output_path=manifest_output_path,
+    )
     return 0
 
 

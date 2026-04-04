@@ -138,7 +138,7 @@ def derive_query_group_v2(
             return "tops_sweater"
         if subcategory_value in {"t_shirt", "shirt_top"}:
             return "tops_shirts"
-        return "tops_general"
+        return "general_items"
 
     if ranking_group_value == "bottoms":
         if subcategory_value == "pants":
@@ -946,7 +946,7 @@ def main() -> int:
         "query_group_definition": {
             "tops_sweater": "ranking_group=tops and subcategory=sweater",
             "tops_shirts": "ranking_group=tops and subcategory in {t_shirt, shirt_top}",
-            "tops_general": "ranking_group=tops and all other fine subcategories",
+            "general_items": "catch-all group for items not assigned to a more specific query group",
             "bottoms_pants": "ranking_group=bottoms and subcategory=pants",
             "bottoms_other": "ranking_group=bottoms and all other fine subcategories",
             "dress": "ranking_group=dress",
