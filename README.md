@@ -1,5 +1,12 @@
 # FitIQ
 
+![Python](https://img.shields.io/badge/Python-3.14-3776AB?logo=python&logoColor=white)
+![Dataset](https://img.shields.io/badge/Dataset-Amazon%20Reviews%202023-6D28D9)
+![CatBoost](https://img.shields.io/badge/CatBoost-ranker-FF6F00)
+![FastAPI](https://img.shields.io/badge/FastAPI-read--only%20API-009688?logo=fastapi&logoColor=white)
+![Desktop](https://img.shields.io/badge/Desktop-Tkinter-4B5563)
+![Serving](https://img.shields.io/badge/Serving-query__group__hybrid__v1-16A34A)
+
 FitIQ is an apparel ranking project built on Amazon Reviews 2023.
 
 The goal is to rank products inside comparable apparel groups so an e-commerce platform can surface items that are more likely to satisfy users on fit and overall quality.
