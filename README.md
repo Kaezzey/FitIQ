@@ -39,6 +39,57 @@ Current query groups:
 
 `general_items` is the catch-all bucket for products that do not land in a more specific fine group.
 
+## Pipeline
+
+The offline pipeline is:
+
+1. Build canonical reviews from raw Amazon review data.
+2. Build a product taxonomy table from metadata.
+3. Build product-level features.
+4. Build a leakage-safe ranking evaluation dataset.
+5. Run heuristic baselines.
+6. Train and tune the CatBoost ranker.
+7. Build the query-group hybrid policy.
+8. Score the full product corpus and write the serving artifact.
+
+Two different tables matter here:
+
+- `ranking_eval_dataset.parquet`
+  This is the training and evaluation table. It is built from joined reviews + taxonomy data using time-based `60% / 75% / 90%` timestamp cutoffs so the model only sees past reviews when features are created and future reviews when labels are created.
+- `product_features.parquet`
+  This is the full product table for serving-time scoring. It is not the training split table. After the CatBoost ranker and hybrid policy are trained from the ranking eval dataset, they are applied to this full product table to create the final ranked artifact.
+
+High-level flow:
+
+```mermaid
+flowchart LR
+    A["Amazon Reviews 2023"] --> B["reviews_canonical.parquet"]
+    A --> C["product_taxonomy.parquet"]
+    B --> D["product_features.parquet"]
+    C --> D
+    B --> E["ranking_eval_dataset.parquet"]
+    C --> E
+    E --> F["baselines + CatBoost + hybrid policy"]
+    D --> G["score_product_rankings.py"]
+    F --> G
+    G --> H["product_rankings_v1.parquet"]
+    H --> I["FastAPI API"]
+    I --> J["Tkinter desktop demo"]
+```
+
+What each stage is doing:
+
+- `reviews_canonical.parquet`
+  Clean review-level table. One row per review.
+- `product_taxonomy.parquet`
+  Metadata-derived product grouping table. This is where the product labels and grouping information come from.
+- `ranking_eval_dataset.parquet`
+  Joined review + taxonomy table rebuilt into leakage-safe train, validation, and test snapshots for model training and offline evaluation.
+- `product_features.parquet`
+  Full-corpus product table. One row per ASIN. This is what gets scored after training is finished.
+- `product_rankings_v1.parquet`
+  Final serving artifact with one score per ASIN, grouped by `query_group_v2`, ready for the API and desktop app.
+
 ## Current v1 setup
 
 The frozen v1 serving artifact uses the query-group hybrid scorer.
@@ -61,37 +112,6 @@ Latest rebuilt test metrics:
 | `query_group_hybrid_v1` | 0.8971 | 0.8958 | 0.2776 |
 
 So the current serving scorer is competitive with the heuristic baseline, slightly lower on test `NDCG@10`, basically tied on `NDCG@20`, and better on Spearman.
-
-## Pipeline
-
-The offline pipeline is:
-
-1. Build canonical reviews from raw Amazon review data.
-2. Build a product taxonomy table from metadata.
-3. Build product-level features.
-4. Build a leakage-safe ranking evaluation dataset.
-5. Run heuristic baselines.
-6. Train and tune the CatBoost ranker.
-7. Build the query-group hybrid policy.
-8. Score the full product corpus and write the serving artifact.
-
-High-level flow:
-
-```mermaid
-flowchart LR
-    A["Amazon Reviews 2023"] --> B["reviews_canonical.parquet"]
-    A --> C["product_taxonomy.parquet"]
-    B --> D["product_features.parquet"]
-    C --> D
-    B --> E["ranking_eval_dataset.parquet"]
-    C --> E
-    E --> F["baselines + CatBoost + hybrid policy"]
-    D --> G["score_product_rankings.py"]
-    F --> G
-    G --> H["product_rankings_v1.parquet"]
-    H --> I["FastAPI API"]
-    I --> J["Tkinter desktop demo"]
-```
 
 ## Repo structure
 
